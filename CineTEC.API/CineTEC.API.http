@@ -1,0 +1,6 @@
+@CineTEC.API_HostAddress = http://localhost:5276
+
+GET {{CineTEC.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
