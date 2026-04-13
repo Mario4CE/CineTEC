@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="cinetec-admin\src\services\" />
     <Folder Include="Controllers\Cliente\" />
     <Folder Include="Services\" />
   </ItemGroup>

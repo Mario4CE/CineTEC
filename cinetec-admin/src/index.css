@@ -1,0 +1,13 @@
+﻿body {
+    background-color: #f5f6fa;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.nav-link {
+    border-radius: 8px;
+}
+
+    .nav-link:hover {
+        background-color: #343a40;
+    }
