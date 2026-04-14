@@ -1,3 +1,31 @@
+/*
+DESCRIPCIÓN:
+Este componente permite gestionar las salas del sistema de cine.
+Incluye funcionalidades para listar, crear, editar y eliminar salas,
+asociándolas a una sucursal y calculando su capacidad automáticamente.
+
+ENTRADAS:
+- Identificador de la sala.
+- Sucursal seleccionada (sucursalId).
+- Número de filas.
+- Número de columnas.
+- Acciones del usuario (guardar, editar, eliminar).
+
+SALIDAS:
+- Renderización de la lista de salas en una tabla.
+- Cálculo automático de la capacidad (filas × columnas).
+- Mensajes de éxito o error (alert).
+- Actualización de datos al crear, editar o eliminar.
+
+RESTRICCIONES:
+- Filas y columnas deben ser números mayores a 0.
+- Se debe seleccionar una sucursal válida.
+- Depende de servicios externos (salasService, sucursalesService).
+- La capacidad es calculada automáticamente y no editable.
+
+Modificado por: Mario 
+*/
+
 import { useEffect, useState } from "react";
 import {
     obtenerSalas,
@@ -8,11 +36,16 @@ import {
 import { obtenerSucursales } from "../services/sucursalesService";
 
 function Salas() {
+
+    // Estados principales
     const [salas, setSalas] = useState([]);
     const [sucursales, setSucursales] = useState([]);
+
+    // Estados para edición
     const [modoEdicion, setModoEdicion] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
+    // Estado del formulario
     const [form, setForm] = useState({
         identificador: "",
         sucursalId: "",
@@ -20,11 +53,13 @@ function Salas() {
         columnas: ""
     });
 
+    // Se ejecuta al cargar el componente
     useEffect(() => {
         cargarSalas();
         cargarSucursales();
     }, []);
 
+    // Carga las salas
     const cargarSalas = async () => {
         try {
             const data = await obtenerSalas();
@@ -34,6 +69,7 @@ function Salas() {
         }
     };
 
+    // Carga las sucursales
     const cargarSucursales = async () => {
         try {
             const data = await obtenerSucursales();
@@ -43,6 +79,7 @@ function Salas() {
         }
     };
 
+    // Maneja cambios en el formulario
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         setForm({
@@ -51,6 +88,7 @@ function Salas() {
         });
     };
 
+    // Limpia el formulario y resetea edición
     const limpiarFormulario = () => {
         setForm({
             identificador: "",
@@ -62,6 +100,7 @@ function Salas() {
         setIdEditar(null);
     };
 
+    // Maneja el envío del formulario
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
@@ -74,9 +113,11 @@ function Salas() {
 
         try {
             if (modoEdicion) {
+                // Actualizar sala
                 await actualizarSala(idEditar, payload);
                 alert("Sala actualizada correctamente");
             } else {
+                // Crear nueva sala
                 await crearSala(payload);
                 alert("Sala agregada correctamente");
             }
@@ -89,9 +130,11 @@ function Salas() {
         }
     };
 
+    // Cargar datos en el formulario para editar
     const editarSala = (s) => {
         setModoEdicion(true);
         setIdEditar(s.id);
+
         setForm({
             identificador: s.identificador,
             sucursalId: s.sucursalId,
@@ -100,6 +143,7 @@ function Salas() {
         });
     };
 
+    // Eliminar sala
     const eliminarSala = async (id) => {
         if (!window.confirm("¿Desea eliminar esta sala?")) return;
 
@@ -113,22 +157,31 @@ function Salas() {
         }
     };
 
+    // Cálculo automático de capacidad
     const capacidad = (Number(form.filas) || 0) * (Number(form.columnas) || 0);
 
     return (
         <div>
+
+            {/* Título */}
             <h2 className="mb-4">Gestión de Salas</h2>
 
+            {/* Formulario */}
             <div className="card shadow-sm p-4 mb-4">
-                <h4 className="mb-3">{modoEdicion ? "Editar Sala" : "Agregar Sala"}</h4>
+                <h4 className="mb-3">
+                    {modoEdicion ? "Editar Sala" : "Agregar Sala"}
+                </h4>
 
                 <form onSubmit={manejarSubmit}>
                     <div className="row">
+
+                        {/* Identificador */}
                         <div className="col-md-3 mb-3">
                             <label className="form-label">Identificador</label>
                             <input type="text" className="form-control" name="identificador" value={form.identificador} onChange={manejarCambio} required />
                         </div>
 
+                        {/* Sucursal */}
                         <div className="col-md-3 mb-3">
                             <label className="form-label">Sucursal</label>
                             <select className="form-select" name="sucursalId" value={form.sucursalId} onChange={manejarCambio} required>
@@ -139,26 +192,31 @@ function Salas() {
                             </select>
                         </div>
 
+                        {/* Filas */}
                         <div className="col-md-2 mb-3">
                             <label className="form-label">Filas</label>
                             <input type="number" className="form-control" name="filas" value={form.filas} onChange={manejarCambio} min="1" required />
                         </div>
 
+                        {/* Columnas */}
                         <div className="col-md-2 mb-3">
                             <label className="form-label">Columnas</label>
                             <input type="number" className="form-control" name="columnas" value={form.columnas} onChange={manejarCambio} min="1" required />
                         </div>
 
+                        {/* Capacidad (automática) */}
                         <div className="col-md-2 mb-3">
                             <label className="form-label">Capacidad</label>
                             <input type="number" className="form-control" value={capacidad} disabled />
                         </div>
                     </div>
 
+                    {/* Botones */}
                     <div className="d-flex gap-2">
                         <button type="submit" className="btn btn-dark">
                             {modoEdicion ? "Actualizar" : "Guardar"}
                         </button>
+
                         <button type="button" className="btn btn-secondary" onClick={limpiarFormulario}>
                             Limpiar
                         </button>
@@ -166,6 +224,7 @@ function Salas() {
                 </form>
             </div>
 
+            {/* Tabla */}
             <div className="card shadow-sm p-4">
                 <h4 className="mb-3">Lista de Salas</h4>
 
@@ -182,6 +241,7 @@ function Salas() {
                                 <th>Acciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {salas.length > 0 ? (
                                 salas.map((s) => (
@@ -206,7 +266,9 @@ function Salas() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="text-center">No hay salas registradas.</td>
+                                    <td colSpan="7" className="text-center">
+                                        No hay salas registradas.
+                                    </td>
                                 </tr>
                             )}
                         </tbody>

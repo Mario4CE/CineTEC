@@ -1,3 +1,29 @@
+/*
+DESCRIPCIÓN:
+Este componente permite gestionar las proyecciones del sistema de cine.
+Incluye funcionalidades para listar, crear y eliminar proyecciones,
+relacionando películas, salas y fechas.
+
+ENTRADAS:
+- Selección de película (peliculaId).
+- Selección de sala (salaId).
+- Fecha y hora de la proyección.
+- Acciones del usuario (guardar, eliminar).
+
+SALIDAS:
+- Renderización de la lista de proyecciones en tabla.
+- Mensajes de confirmación o error (alert).
+- Actualización dinámica de datos al crear o eliminar.
+
+RESTRICCIONES:
+- Debe seleccionarse una película y una sala válidas.
+- La fecha es obligatoria.
+- Depende de servicios externos (peliculasService, salasService, proyeccionesService).
+- Requiere que existan películas y salas registradas previamente.
+
+Modificado por: Mario 
+*/
+
 import { useEffect, useState } from "react";
 import { obtenerPeliculas } from "../services/peliculasService";
 import { obtenerSalas } from "../services/salasService";
@@ -8,22 +34,27 @@ import {
 } from "../services/proyeccionesService";
 
 function Proyecciones() {
+
+    // Estados principales
     const [proyecciones, setProyecciones] = useState([]);
     const [peliculas, setPeliculas] = useState([]);
     const [salas, setSalas] = useState([]);
 
+    // Estado del formulario
     const [form, setForm] = useState({
         peliculaId: "",
         salaId: "",
         fecha: ""
     });
 
+    // Se ejecuta al cargar el componente
     useEffect(() => {
         cargarProyecciones();
         cargarPeliculas();
         cargarSalas();
     }, []);
 
+    // Carga las proyecciones
     const cargarProyecciones = async () => {
         try {
             const data = await obtenerProyecciones();
@@ -33,6 +64,7 @@ function Proyecciones() {
         }
     };
 
+    // Carga las películas
     const cargarPeliculas = async () => {
         try {
             const data = await obtenerPeliculas();
@@ -42,6 +74,7 @@ function Proyecciones() {
         }
     };
 
+    // Carga las salas
     const cargarSalas = async () => {
         try {
             const data = await obtenerSalas();
@@ -51,6 +84,7 @@ function Proyecciones() {
         }
     };
 
+    // Maneja cambios en el formulario
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         setForm({
@@ -59,6 +93,7 @@ function Proyecciones() {
         });
     };
 
+    // Limpia el formulario
     const limpiarFormulario = () => {
         setForm({
             peliculaId: "",
@@ -67,6 +102,7 @@ function Proyecciones() {
         });
     };
 
+    // Maneja el envío del formulario
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
@@ -87,6 +123,7 @@ function Proyecciones() {
         }
     };
 
+    // Elimina una proyección
     const eliminarProyeccion = async (id) => {
         if (!window.confirm("¿Desea eliminar esta proyección?")) return;
 
@@ -102,13 +139,18 @@ function Proyecciones() {
 
     return (
         <div>
+
+            {/* Título */}
             <h2 className="mb-4">Gestión de Proyecciones</h2>
 
+            {/* Formulario */}
             <div className="card shadow-sm p-4 mb-4">
                 <h4 className="mb-3">Agregar Proyección</h4>
 
                 <form onSubmit={manejarSubmit}>
                     <div className="row">
+
+                        {/* Selección de película */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Película</label>
                             <select className="form-select" name="peliculaId" value={form.peliculaId} onChange={manejarCambio} required>
@@ -119,6 +161,7 @@ function Proyecciones() {
                             </select>
                         </div>
 
+                        {/* Selección de sala */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Sala</label>
                             <select className="form-select" name="salaId" value={form.salaId} onChange={manejarCambio} required>
@@ -131,12 +174,14 @@ function Proyecciones() {
                             </select>
                         </div>
 
+                        {/* Fecha y hora */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Fecha y hora</label>
                             <input type="datetime-local" className="form-control" name="fecha" value={form.fecha} onChange={manejarCambio} required />
                         </div>
                     </div>
 
+                    {/* Botones */}
                     <div className="d-flex gap-2">
                         <button type="submit" className="btn btn-dark">Guardar</button>
                         <button type="button" className="btn btn-secondary" onClick={limpiarFormulario}>
@@ -146,6 +191,7 @@ function Proyecciones() {
                 </form>
             </div>
 
+            {/* Tabla */}
             <div className="card shadow-sm p-4">
                 <h4 className="mb-3">Lista de Proyecciones</h4>
 
@@ -161,6 +207,7 @@ function Proyecciones() {
                                 <th>Acciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {proyecciones.length > 0 ? (
                                 proyecciones.map((p) => (
@@ -179,7 +226,9 @@ function Proyecciones() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center">No hay proyecciones registradas.</td>
+                                    <td colSpan="6" className="text-center">
+                                        No hay proyecciones registradas.
+                                    </td>
                                 </tr>
                             )}
                         </tbody>

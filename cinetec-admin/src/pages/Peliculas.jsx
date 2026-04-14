@@ -1,3 +1,28 @@
+/*
+DESCRIPCIÓN:
+Este componente permite gestionar las películas del sistema (CRUD).
+Incluye funcionalidades para listar, agregar, editar y eliminar películas,
+interactuando con el backend mediante servicios.
+
+ENTRADAS:
+- Datos ingresados en el formulario (nombre, duración, director, etc.).
+- Acciones del usuario (click en guardar, editar, eliminar).
+- Respuestas del backend a través de los servicios.
+
+SALIDAS:
+- Renderización de la lista de películas en una tabla.
+- Mensajes de éxito o error (alertas).
+- Actualización visual de los datos al crear, editar o eliminar.
+
+RESTRICCIONES:
+- La duración debe ser numérica y mayor a 0.
+- Los campos obligatorios deben completarse (required).
+- Depende de los servicios (peliculasService) para funcionar.
+- Requiere conexión con el backend.
+
+Modificado por: Mario 
+*/
+
 import { useEffect, useState } from "react";
 import {
     obtenerPeliculas,
@@ -7,12 +32,17 @@ import {
 } from "../services/peliculasService";
 
 function Peliculas() {
-    const [peliculas, setPeliculas] = useState([]);
-    const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState("");
+
+    // Estados principales
+    const [peliculas, setPeliculas] = useState([]); // Lista de películas
+    const [cargando, setCargando] = useState(true); // Estado de carga
+    const [error, setError] = useState(""); // Mensajes de error
+
+    // Estados para edición
     const [modoEdicion, setModoEdicion] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
+    // Estado del formulario
     const [form, setForm] = useState({
         nombreOriginal: "",
         nombreComercial: "",
@@ -23,10 +53,12 @@ function Peliculas() {
         clasificacion: ""
     });
 
+    // Se ejecuta al cargar el componente
     useEffect(() => {
         cargarPeliculas();
     }, []);
 
+    // Función para obtener películas del backend
     const cargarPeliculas = async () => {
         try {
             setCargando(true);
@@ -41,6 +73,7 @@ function Peliculas() {
         }
     };
 
+    // Maneja cambios en inputs del formulario
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         setForm({
@@ -49,6 +82,7 @@ function Peliculas() {
         });
     };
 
+    // Limpia el formulario y reinicia edición
     const limpiarFormulario = () => {
         setForm({
             nombreOriginal: "",
@@ -63,9 +97,11 @@ function Peliculas() {
         setIdEditar(null);
     };
 
+    // Maneja envío del formulario (crear o actualizar)
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
+        // Convertir duración a número
         const payload = {
             ...form,
             duracion: Number(form.duracion)
@@ -73,9 +109,11 @@ function Peliculas() {
 
         try {
             if (modoEdicion) {
+                // Actualiza película existente
                 await actualizarPelicula(idEditar, payload);
                 alert("Película actualizada correctamente");
             } else {
+                // Crea nueva película
                 await crearPelicula(payload);
                 alert("Película agregada correctamente");
             }
@@ -88,6 +126,7 @@ function Peliculas() {
         }
     };
 
+    // Carga datos en el formulario para editar
     const editarPelicula = (pelicula) => {
         setModoEdicion(true);
         setIdEditar(pelicula.id);
@@ -103,6 +142,7 @@ function Peliculas() {
         });
     };
 
+    // Elimina una película
     const eliminarPelicula = async (id) => {
         if (!window.confirm("¿Desea eliminar esta película?")) return;
 
@@ -118,8 +158,11 @@ function Peliculas() {
 
     return (
         <div>
+
+            {/* Título */}
             <h2 className="mb-4">Gestión de Películas</h2>
 
+            {/* Formulario */}
             <div className="card shadow-sm p-4 mb-4">
                 <h4 className="mb-3">
                     {modoEdicion ? "Editar Película" : "Agregar Película"}
@@ -127,6 +170,8 @@ function Peliculas() {
 
                 <form onSubmit={manejarSubmit}>
                     <div className="row">
+
+                        {/* Campos del formulario */}
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Nombre original</label>
                             <input type="text" className="form-control" name="nombreOriginal" value={form.nombreOriginal} onChange={manejarCambio} required />
@@ -163,6 +208,7 @@ function Peliculas() {
                         </div>
                     </div>
 
+                    {/* Botones */}
                     <div className="d-flex gap-2">
                         <button type="submit" className="btn btn-dark">
                             {modoEdicion ? "Actualizar" : "Guardar"}
@@ -175,12 +221,15 @@ function Peliculas() {
                 </form>
             </div>
 
+            {/* Tabla de películas */}
             <div className="card shadow-sm p-4">
                 <h4 className="mb-3">Lista de Películas</h4>
 
+                {/* Estados */}
                 {cargando && <p>Cargando películas...</p>}
                 {error && <p className="text-danger">{error}</p>}
 
+                {/* Tabla */}
                 {!cargando && !error && (
                     <div className="table-responsive">
                         <table className="table table-bordered table-hover align-middle">
@@ -220,7 +269,9 @@ function Peliculas() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center">No hay películas registradas.</td>
+                                        <td colSpan="7" className="text-center">
+                                            No hay películas registradas.
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>

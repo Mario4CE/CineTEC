@@ -1,3 +1,29 @@
+/*
+DESCRIPCIÓN:
+Este componente permite gestionar las sucursales del sistema de cine.
+Incluye funcionalidades para listar, crear, editar y eliminar sucursales,
+mostrando información como nombre, ubicación y cantidad de salas.
+
+ENTRADAS:
+- Nombre de la sucursal.
+- Ubicación de la sucursal.
+- Cantidad de salas.
+- Acciones del usuario (guardar, editar, eliminar).
+
+SALIDAS:
+- Renderización de la lista de sucursales en una tabla.
+- Mensajes de confirmación o error (alert).
+- Actualización de datos al crear, editar o eliminar.
+
+RESTRICCIONES:
+- Todos los campos son obligatorios.
+- La cantidad de salas debe ser un número mayor o igual a 0.
+- Depende de servicios externos (sucursalesService).
+- Requiere conexión con el backend.
+
+Modificado por: Mario 
+*/
+
 import { useEffect, useState } from "react";
 import {
     obtenerSucursales,
@@ -7,20 +33,27 @@ import {
 } from "../services/sucursalesService";
 
 function Sucursales() {
+
+    // Estado principal (lista de sucursales)
     const [sucursales, setSucursales] = useState([]);
+
+    // Estados para edición
     const [modoEdicion, setModoEdicion] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
+    // Estado del formulario
     const [form, setForm] = useState({
         nombre: "",
         ubicacion: "",
         cantidadSalas: ""
     });
 
+    // Se ejecuta al cargar el componente
     useEffect(() => {
         cargarSucursales();
     }, []);
 
+    // Cargar sucursales desde el backend
     const cargarSucursales = async () => {
         try {
             const data = await obtenerSucursales();
@@ -30,6 +63,7 @@ function Sucursales() {
         }
     };
 
+    // Manejar cambios en el formulario
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         setForm({
@@ -38,6 +72,7 @@ function Sucursales() {
         });
     };
 
+    // Limpiar formulario
     const limpiarFormulario = () => {
         setForm({
             nombre: "",
@@ -48,6 +83,7 @@ function Sucursales() {
         setIdEditar(null);
     };
 
+    // Enviar formulario (crear o actualizar)
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
@@ -58,9 +94,11 @@ function Sucursales() {
 
         try {
             if (modoEdicion) {
+                // Actualizar sucursal
                 await actualizarSucursal(idEditar, payload);
                 alert("Sucursal actualizada correctamente");
             } else {
+                // Crear sucursal
                 await crearSucursal(payload);
                 alert("Sucursal agregada correctamente");
             }
@@ -73,9 +111,11 @@ function Sucursales() {
         }
     };
 
+    // Cargar datos para editar
     const editarSucursal = (s) => {
         setModoEdicion(true);
         setIdEditar(s.id);
+
         setForm({
             nombre: s.nombre,
             ubicacion: s.ubicacion,
@@ -83,6 +123,7 @@ function Sucursales() {
         });
     };
 
+    // Eliminar sucursal
     const eliminarSucursal = async (id) => {
         if (!window.confirm("¿Desea eliminar esta sucursal?")) return;
 
@@ -98,8 +139,11 @@ function Sucursales() {
 
     return (
         <div>
+
+            {/* Título */}
             <h2 className="mb-4">Gestión de Sucursales</h2>
 
+            {/* Formulario */}
             <div className="card shadow-sm p-4 mb-4">
                 <h4 className="mb-3">
                     {modoEdicion ? "Editar Sucursal" : "Agregar Sucursal"}
@@ -107,22 +151,27 @@ function Sucursales() {
 
                 <form onSubmit={manejarSubmit}>
                     <div className="row">
+
+                        {/* Nombre */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Nombre</label>
                             <input type="text" className="form-control" name="nombre" value={form.nombre} onChange={manejarCambio} required />
                         </div>
 
+                        {/* Ubicación */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Ubicación</label>
                             <input type="text" className="form-control" name="ubicacion" value={form.ubicacion} onChange={manejarCambio} required />
                         </div>
 
+                        {/* Cantidad de salas */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Cantidad de salas</label>
                             <input type="number" className="form-control" name="cantidadSalas" value={form.cantidadSalas} onChange={manejarCambio} required min="0" />
                         </div>
                     </div>
 
+                    {/* Botones */}
                     <div className="d-flex gap-2">
                         <button type="submit" className="btn btn-dark">
                             {modoEdicion ? "Actualizar" : "Guardar"}
@@ -135,6 +184,7 @@ function Sucursales() {
                 </form>
             </div>
 
+            {/* Tabla */}
             <div className="card shadow-sm p-4">
                 <h4 className="mb-3">Lista de Sucursales</h4>
 
@@ -149,6 +199,7 @@ function Sucursales() {
                                 <th>Acciones</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {sucursales.length > 0 ? (
                                 sucursales.map((s) => (
@@ -171,7 +222,9 @@ function Sucursales() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="text-center">No hay sucursales registradas.</td>
+                                    <td colSpan="5" className="text-center">
+                                        No hay sucursales registradas.
+                                    </td>
                                 </tr>
                             )}
                         </tbody>
