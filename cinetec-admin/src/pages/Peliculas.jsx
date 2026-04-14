@@ -3,19 +3,33 @@ import API from "../services/api";
 
 function Peliculas() {
     const [peliculas, setPeliculas] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        obtenerPeliculas();
+        const cargarPeliculas = async () => {
+            try {
+                const res = await API.get("/admin/peliculas");
+                console.log("Respuesta API:", res.data);
+                setPeliculas(res.data);
+            } catch (err) {
+                console.error("Error al obtener películas:", err);
+                setError("No se pudieron cargar las películas.");
+            } finally {
+                setCargando(false);
+            }
+        };
+
+        cargarPeliculas();
     }, []);
 
-    const obtenerPeliculas = async () => {
-        try {
-            const res = await API.get("/admin/peliculas");
-            setPeliculas(res.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    if (cargando) {
+        return <h3 className="p-4">Cargando películas...</h3>;
+    }
+
+    if (error) {
+        return <h3 className="p-4 text-danger">{error}</h3>;
+    }
 
     return (
         <div>
@@ -33,14 +47,22 @@ function Peliculas() {
                     </thead>
 
                     <tbody>
-                        {peliculas.map((p) => (
-                            <tr key={p.id}>
-                                <td>{p.id}</td>
-                                <td>{p.nombreComercial}</td>
-                                <td>{p.duracion}</td>
-                                <td>{p.director}</td>
+                        {peliculas.length > 0 ? (
+                            peliculas.map((p) => (
+                                <tr key={p.id}>
+                                    <td>{p.id}</td>
+                                    <td>{p.nombreComercial}</td>
+                                    <td>{p.duracion}</td>
+                                    <td>{p.director}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className="text-center">
+                                    No hay películas registradas.
+                                </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
             </div>
