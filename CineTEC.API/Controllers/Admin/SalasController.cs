@@ -15,98 +15,95 @@ using CineTec.API.Models;
 
 namespace CineTec.API.Controllers.Admin
 {
-    [ApiController] // Indica que es un controlador de API
-    [Route("api/[controller]")] // Ruta base: api/salas
+    [ApiController]
+    [Route("api/admin/[controller]")]
     public class SalasController : ControllerBase
     {
-        private readonly CineTecDbContext _context; // Contexto de base de datos
+        private readonly CineTecDbContext _context;
 
-        // Constructor con inyección de dependencias
         public SalasController(CineTecDbContext context)
         {
             _context = context;
         }
 
-        // ============================
-        // GET: api/salas
-        // ============================
-        // Obtiene todas las salas junto con su sucursal asociada
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var salas = await _context.Salas
-                .Include(s => s.Sucursal) // Incluye la relación con Sucursal
+                .Include(s => s.Sucursal)
                 .ToListAsync();
 
-            return Ok(salas); // Retorna lista de salas
+            return Ok(salas);
         }
 
-        // ============================
-        // POST: api/salas
-        // ============================
-        // Crea una nueva sala
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var sala = await _context.Salas
+                .Include(s => s.Sucursal)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (sala == null)
+                return NotFound(new { mensaje = "Sala no encontrada" });
+
+            return Ok(sala);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SalaDto dto)
         {
-            // Verifica que la sucursal exista
             var sucursalExiste = await _context.Sucursales.AnyAsync(s => s.Id == dto.SucursalId);
             if (!sucursalExiste)
                 return BadRequest(new { mensaje = "La sucursal no existe" });
 
-            // Se crea la nueva sala
             var sala = new Sala
             {
                 Identificador = dto.Identificador,
                 SucursalId = dto.SucursalId,
                 Filas = dto.Filas,
                 Columnas = dto.Columnas,
-                Capacidad = dto.Filas * dto.Columnas // Cálculo automático de capacidad
+                Capacidad = dto.Filas * dto.Columnas
             };
 
-            _context.Salas.Add(sala); // Se agrega a la BD
-            await _context.SaveChangesAsync(); // Guarda cambios
+            _context.Salas.Add(sala);
+            await _context.SaveChangesAsync();
 
-            return Ok(new { mensaje = "Sala creada correctamente", sala });
+            return CreatedAtAction(nameof(GetById), new { id = sala.Id }, sala);
         }
 
-        // ============================
-        // PUT: api/salas/{id}
-        // ============================
-        // Actualiza una sala existente
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] SalaDto dto)
         {
-            var sala = await _context.Salas.FindAsync(id); // Busca la sala
+            var sala = await _context.Salas.FindAsync(id);
 
             if (sala == null)
                 return NotFound(new { mensaje = "Sala no encontrada" });
 
-            // Actualiza los datos
+            var sucursalExiste = await _context.Sucursales.AnyAsync(s => s.Id == dto.SucursalId);
+            if (!sucursalExiste)
+                return BadRequest(new { mensaje = "La sucursal no existe" });
+
             sala.Identificador = dto.Identificador;
             sala.SucursalId = dto.SucursalId;
             sala.Filas = dto.Filas;
             sala.Columnas = dto.Columnas;
-            sala.Capacidad = dto.Filas * dto.Columnas; // Recalcula capacidad
+            sala.Capacidad = dto.Filas * dto.Columnas;
 
-            await _context.SaveChangesAsync(); // Guarda cambios
+            await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Sala actualizada correctamente", sala });
         }
 
-        // ============================
-        // DELETE: api/salas/{id}
-        // ============================
-        // Elimina una sala
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var sala = await _context.Salas.FindAsync(id); // Busca la sala
+            var sala = await _context.Salas.FindAsync(id);
 
             if (sala == null)
                 return NotFound(new { mensaje = "Sala no encontrada" });
 
-            _context.Salas.Remove(sala); // Elimina de la BD
-            await _context.SaveChangesAsync(); // Guarda cambios
+            _context.Salas.Remove(sala);
+            await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Sala eliminada correctamente" });
         }

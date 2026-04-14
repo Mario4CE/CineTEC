@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import API from "../services/api";
+import {
+    obtenerPeliculas,
+    crearPelicula,
+    actualizarPelicula,
+    eliminarPeliculaService
+} from "../services/peliculasService";
 
 function Peliculas() {
     const [peliculas, setPeliculas] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
-
     const [modoEdicion, setModoEdicion] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
@@ -26,11 +30,11 @@ function Peliculas() {
     const cargarPeliculas = async () => {
         try {
             setCargando(true);
-            const res = await API.get("/admin/peliculas");
-            setPeliculas(res.data);
+            const data = await obtenerPeliculas();
+            setPeliculas(data);
             setError("");
         } catch (err) {
-            console.error("Error al obtener películas:", err);
+            console.error(err);
             setError("No se pudieron cargar las películas.");
         } finally {
             setCargando(false);
@@ -69,17 +73,17 @@ function Peliculas() {
 
         try {
             if (modoEdicion) {
-                await API.put(`/admin/peliculas/${idEditar}`, payload);
+                await actualizarPelicula(idEditar, payload);
                 alert("Película actualizada correctamente");
             } else {
-                await API.post("/admin/peliculas", payload);
+                await crearPelicula(payload);
                 alert("Película agregada correctamente");
             }
 
             limpiarFormulario();
             cargarPeliculas();
         } catch (err) {
-            console.error("Error al guardar película:", err);
+            console.error(err);
             alert("Ocurrió un error al guardar la película");
         }
     };
@@ -100,15 +104,14 @@ function Peliculas() {
     };
 
     const eliminarPelicula = async (id) => {
-        const confirmar = window.confirm("¿Desea eliminar esta película?");
-        if (!confirmar) return;
+        if (!window.confirm("¿Desea eliminar esta película?")) return;
 
         try {
-            await API.delete(`/admin/peliculas/${id}`);
+            await eliminarPeliculaService(id);
             alert("Película eliminada correctamente");
             cargarPeliculas();
         } catch (err) {
-            console.error("Error al eliminar película:", err);
+            console.error(err);
             alert("No se pudo eliminar la película");
         }
     };
@@ -126,85 +129,37 @@ function Peliculas() {
                     <div className="row">
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Nombre original</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="nombreOriginal"
-                                value={form.nombreOriginal}
-                                onChange={manejarCambio}
-                                required
-                            />
+                            <input type="text" className="form-control" name="nombreOriginal" value={form.nombreOriginal} onChange={manejarCambio} required />
                         </div>
 
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Nombre comercial</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="nombreComercial"
-                                value={form.nombreComercial}
-                                onChange={manejarCambio}
-                                required
-                            />
+                            <input type="text" className="form-control" name="nombreComercial" value={form.nombreComercial} onChange={manejarCambio} required />
                         </div>
 
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Imagen</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="imagen"
-                                value={form.imagen}
-                                onChange={manejarCambio}
-                                placeholder="Ejemplo: imagen.jpg o URL"
-                            />
+                            <input type="text" className="form-control" name="imagen" value={form.imagen} onChange={manejarCambio} />
                         </div>
 
                         <div className="col-md-6 mb-3">
-                            <label className="form-label">Duración (minutos)</label>
-                            <input
-                                type="number"
-                                className="form-control"
-                                name="duracion"
-                                value={form.duracion}
-                                onChange={manejarCambio}
-                                required
-                                min="1"
-                            />
+                            <label className="form-label">Duración</label>
+                            <input type="number" className="form-control" name="duracion" value={form.duracion} onChange={manejarCambio} required min="1" />
                         </div>
 
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Protagonistas</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="protagonistas"
-                                value={form.protagonistas}
-                                onChange={manejarCambio}
-                            />
+                            <input type="text" className="form-control" name="protagonistas" value={form.protagonistas} onChange={manejarCambio} />
                         </div>
 
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Director</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="director"
-                                value={form.director}
-                                onChange={manejarCambio}
-                            />
+                            <input type="text" className="form-control" name="director" value={form.director} onChange={manejarCambio} />
                         </div>
 
                         <div className="col-md-6 mb-3">
                             <label className="form-label">Clasificación</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="clasificacion"
-                                value={form.clasificacion}
-                                onChange={manejarCambio}
-                                placeholder="Ejemplo: PG-13"
-                            />
+                            <input type="text" className="form-control" name="clasificacion" value={form.clasificacion} onChange={manejarCambio} />
                         </div>
                     </div>
 
@@ -213,11 +168,7 @@ function Peliculas() {
                             {modoEdicion ? "Actualizar" : "Guardar"}
                         </button>
 
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={limpiarFormulario}
-                        >
+                        <button type="button" className="btn btn-secondary" onClick={limpiarFormulario}>
                             Limpiar
                         </button>
                     </div>
@@ -257,17 +208,10 @@ function Peliculas() {
                                             <td>{p.clasificacion}</td>
                                             <td>
                                                 <div className="d-flex gap-2">
-                                                    <button
-                                                        className="btn btn-warning btn-sm"
-                                                        onClick={() => editarPelicula(p)}
-                                                    >
+                                                    <button className="btn btn-warning btn-sm" onClick={() => editarPelicula(p)}>
                                                         Editar
                                                     </button>
-
-                                                    <button
-                                                        className="btn btn-danger btn-sm"
-                                                        onClick={() => eliminarPelicula(p.id)}
-                                                    >
+                                                    <button className="btn btn-danger btn-sm" onClick={() => eliminarPelicula(p.id)}>
                                                         Eliminar
                                                     </button>
                                                 </div>
@@ -276,9 +220,7 @@ function Peliculas() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center">
-                                            No hay películas registradas.
-                                        </td>
+                                        <td colSpan="7" className="text-center">No hay películas registradas.</td>
                                     </tr>
                                 )}
                             </tbody>

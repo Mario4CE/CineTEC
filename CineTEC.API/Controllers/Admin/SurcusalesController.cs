@@ -15,24 +15,17 @@ using CineTec.API.Models;
 
 namespace CineTec.API.Controllers.Admin
 {
-    // Indica que es un controlador de API
     [ApiController]
-
-    // Ruta base: api/sucursales
-    [Route("api/[controller]")]
+    [Route("api/admin/[controller]")]
     public class SucursalesController : ControllerBase
     {
-        // Contexto de base de datos
         private readonly CineTecDbContext _context;
 
-        // Constructor que recibe el contexto
         public SucursalesController(CineTecDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/sucursales
-        // Obtiene todas las sucursales
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -40,12 +33,29 @@ namespace CineTec.API.Controllers.Admin
             return Ok(sucursales);
         }
 
-        // POST: api/sucursales
-        // Crea una nueva sucursal
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var sucursal = await _context.Sucursales.FindAsync(id);
+
+            if (sucursal == null)
+                return NotFound(new { mensaje = "Sucursal no encontrada" });
+
+            return Ok(sucursal);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SucursalDto dto)
         {
-            // Se crea una nueva instancia de Sucursal a partir del DTO
+            if (string.IsNullOrWhiteSpace(dto.Nombre))
+                return BadRequest(new { mensaje = "El nombre es obligatorio" });
+
+            if (string.IsNullOrWhiteSpace(dto.Ubicacion))
+                return BadRequest(new { mensaje = "La ubicación es obligatoria" });
+
+            if (dto.CantidadSalas < 0)
+                return BadRequest(new { mensaje = "La cantidad de salas no puede ser negativa" });
+
             var sucursal = new Sucursal
             {
                 Nombre = dto.Nombre,
@@ -53,50 +63,46 @@ namespace CineTec.API.Controllers.Admin
                 CantidadSalas = dto.CantidadSalas
             };
 
-            // Se agrega a la base de datos
             _context.Sucursales.Add(sucursal);
             await _context.SaveChangesAsync();
 
-            // Respuesta exitosa
-            return Ok(new { mensaje = "Sucursal creada correctamente", sucursal });
+            return CreatedAtAction(nameof(GetById), new { id = sucursal.Id }, sucursal);
         }
 
-        // PUT: api/sucursales/{id}
-        // Actualiza una sucursal existente
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] SucursalDto dto)
         {
-            // Busca la sucursal por ID
             var sucursal = await _context.Sucursales.FindAsync(id);
 
-            // Si no existe, retorna error 404
             if (sucursal == null)
                 return NotFound(new { mensaje = "Sucursal no encontrada" });
 
-            // Actualiza los datos
+            if (string.IsNullOrWhiteSpace(dto.Nombre))
+                return BadRequest(new { mensaje = "El nombre es obligatorio" });
+
+            if (string.IsNullOrWhiteSpace(dto.Ubicacion))
+                return BadRequest(new { mensaje = "La ubicación es obligatoria" });
+
+            if (dto.CantidadSalas < 0)
+                return BadRequest(new { mensaje = "La cantidad de salas no puede ser negativa" });
+
             sucursal.Nombre = dto.Nombre;
             sucursal.Ubicacion = dto.Ubicacion;
             sucursal.CantidadSalas = dto.CantidadSalas;
 
-            // Guarda cambios
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Sucursal actualizada correctamente", sucursal });
         }
 
-        // DELETE: api/sucursales/{id}
-        // Elimina una sucursal
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // Busca la sucursal
             var sucursal = await _context.Sucursales.FindAsync(id);
 
-            // Si no existe, retorna error 404
             if (sucursal == null)
                 return NotFound(new { mensaje = "Sucursal no encontrada" });
 
-            // Elimina la sucursal
             _context.Sucursales.Remove(sucursal);
             await _context.SaveChangesAsync();
 
