@@ -23,58 +23,58 @@ Modificado por: Mario
 
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { login } from '../services/authService' // 👈 IMPORTANTE
 
 function Login() {
 
-    // Hook para navegar entre rutas
     const navigate = useNavigate()
 
-    // Estados para almacenar usuario y contraseña
     const [usuario, setUsuario] = useState('')
     const [contrasena, setContrasena] = useState('')
 
-    // Función que maneja el login
-    const manejarLogin = (e) => {
-        e.preventDefault() // Evita recargar la página
+    // 🔥 LOGIN REAL
+    const manejarLogin = async (e) => {
+        e.preventDefault()
 
-        // Validación simple de credenciales
-        if (usuario === 'admin' && contrasena === '1234') {
-            // Redirige al panel admin
+        try {
+            const data = await login(usuario, contrasena)
+
+            // guardar sesión
+            localStorage.setItem("usuario", JSON.stringify(data))
+
+            // redirigir
             navigate('/admin')
-        } else {
-            // Muestra error
+
+        } catch (error) {
+            console.error(error)
             alert('Credenciales incorrectas')
         }
     }
 
     return (
-        // Contenedor principal centrado
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
 
-            {/* Tarjeta de login */}
             <div className="card shadow p-4" style={{ width: '400px' }}>
 
                 <h2 className="text-center mb-4">CineTEC</h2>
 
-                {/* Formulario */}
                 <form onSubmit={manejarLogin}>
 
-                    {/* Input usuario */}
                     <input
                         className="form-control mb-3"
                         placeholder="Usuario"
+                        value={usuario}
                         onChange={(e) => setUsuario(e.target.value)}
                     />
 
-                    {/* Input contraseña */}
                     <input
                         type="password"
                         className="form-control mb-3"
                         placeholder="Contraseña"
+                        value={contrasena}
                         onChange={(e) => setContrasena(e.target.value)}
                     />
 
-                    {/* Botón enviar */}
                     <button className="btn btn-dark w-100">
                         Ingresar
                     </button>
