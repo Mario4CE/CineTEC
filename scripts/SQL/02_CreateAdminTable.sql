@@ -36,7 +36,7 @@ CREATE TABLE Sucursales (
 // Crear tabla de Salas
 CREATE TABLE Salas (
     Id INT PRIMARY KEY IDENTITY(1,1),
-    Identificador NVARCHAR(50) NOT NULL,
+    Identificador NVARCHAR(50) NOT NULL ,
     SucursalId INT NOT NULL,
     Filas INT NOT NULL,
     Columnas INT NOT NULL,

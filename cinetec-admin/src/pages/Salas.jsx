@@ -124,10 +124,14 @@ function Salas() {
 
             limpiarFormulario();
             cargarSalas();
-        } catch (error) {
-            console.error(error);
-            alert("Ocurrió un error al guardar la sala");
-        }
+            }catch (error) {
+                console.error(error);
+
+                const mensaje =
+                    error?.response?.data?.mensaje || "Ocurrió un error al guardar la sala";
+
+                alert(mensaje);
+}
     };
 
     // Cargar datos en el formulario para editar
