@@ -23,6 +23,9 @@ namespace CineTec.API.Data
         // Tabla de Administradores
         public DbSet<Administrador> Administradores => Set<Administrador>();
 
+        // Tabla de Usuarios/Clientes
+        public DbSet<Usuario> Usuarios => Set<Usuario>();
+        
         // Tabla de Películas
         public DbSet<Pelicula> Peliculas => Set<Pelicula>();
 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Registro</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <!-- Header -->
+            <div class="auth-header">
+                <h1>🎬 CineTec</h1>
+                <p>Crea tu cuenta y comienza a reservar</p>
+            </div>
+
+            <!-- Body -->
+            <div class="auth-body">
+                <!-- Alertas -->
+                <div id="alertError" class="alert alert-error"></div>
+                <div id="alertSuccess" class="alert alert-success"></div>
+
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Registrando usuario...</p>
+                </div>
+
+                <!-- Formulario de Registro -->
+                <form id="registroForm" class="auth-form">
+                    <!-- Nombre -->
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="nombre" 
+                            name="nombre" 
+                            placeholder="Tu nombre"
+                            required
+                        >
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input 
+                            type="text" 
+                            id="apellido" 
+                            name="apellido" 
+                            placeholder="Tu apellido"
+                            required
+                        >
+                    </div>
+
+                    <!-- Cédula -->
+                    <div class="form-group">
+                        <label for="cedula">Cédula de Identidad</label>
+                        <input 
+                            type="text" 
+                            id="cedula" 
+                            name="cedula" 
+                            placeholder="Ej: 1234567890"
+                            required
+                        >
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="form-group">
+                        <label for="telefono">Teléfono (Opcional)</label>
+                        <input 
+                            type="tel" 
+                            id="telefono" 
+                            name="telefono" 
+                            placeholder="8 dígitos"
+                        >
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div class="form-group">
+                        <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                        <input 
+                            type="date" 
+                            id="fechaNacimiento" 
+                            name="fechaNacimiento"
+                            required
+                        >
+                    </div>
+
+                    <!-- Botón Registrar -->
+                    <button type="submit" class="btn-auth">Registrarse</button>
+                </form>
+
+                <!-- Link a Login -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="margin: 0; font-size: 14px; color: #7f8c8d;">
+                        ¿Ya tienes cuenta?
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="auth-footer">
+                <p>
+                    <a href="index.html">Inicia sesión aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+
+    <script>
+        // Verificar si el usuario ya está autenticado
+        document.addEventListener('DOMContentLoaded', function() {
+            if (verificarSesion()) {
+                // Si ya está autenticado, redirigir a la próxima página
+                redirigir('menu.html');
+            }
+
+            // Establecer fecha máxima de nacimiento (hoy - 13 años)
+            const fechaInput = document.getElementById('fechaNacimiento');
+            const hoy = new Date();
+            const hace13Anos = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
+            
+            const año = hace13Anos.getFullYear();
+            const mes = String(hace13Anos.getMonth() + 1).padStart(2, '0');
+            const día = String(hace13Anos.getDate()).padStart(2, '0');
+            fechaInput.max = `${año}-${mes}-${día}`;
+
+            // Manejar el envío del formulario de registro
+            const registroForm = document.getElementById('registroForm');
+            registroForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const datosUsuario = {
+                    nombre: document.getElementById('nombre').value,
+                    apellido: document.getElementById('apellido').value,
+                    cedula: document.getElementById('cedula').value,
+                    telefono: document.getElementById('telefono').value,
+                    fechaNacimiento: document.getElementById('fechaNacimiento').value,
+                };
+
+                try {
+                    const usuario = await registrarUsuario(datosUsuario);
+                    mostrarExito(`¡Registro exitoso! Bienvenido, ${usuario.nombreCompleto}`);
+                    
+                    // Redirigir después de 2 segundos
+                    redirigir('menu.html', 2000);
+                } catch (error) {
+                    mostrarError(error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

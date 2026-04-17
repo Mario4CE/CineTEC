@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Menú Principal</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="container-sm mt-30">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2>Bienvenido a CineTec</h2>
+                <p id="bienvenidaUsuario">¡Disfruta tu experiencia!</p>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-20">
+                    <button class="btn btn-primary btn-block" onclick="redirigir('cines.html')">Comprar boletos</button>
+                </div>
+                <div class="mb-20">
+                    <button class="btn btn-secondary btn-block" onclick="redirigir('mis-boletos.html')">Ver mis boletos</button>
+                </div>
+                <div class="mb-20">
+                    <button class="btn btn-info btn-block" onclick="redirigir('perfil.html')">Mi perfil</button>
+                </div>
+                <div class="mb-20">
+                    <button class="btn btn-danger btn-block" onclick="salir()">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            protegerRuta();
+            const usuario = obtenerUsuarioActual();
+            if (usuario && usuario.nombreCompleto) {
+                document.getElementById('bienvenidaUsuario').textContent = `¡Bienvenido, ${usuario.nombreCompleto}!`;
+            }
+        });
+    </script>
+</body>
+</html>
