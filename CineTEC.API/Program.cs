@@ -33,6 +33,8 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseCors("PermitirTodo");
 
 app.UseAuthorization();

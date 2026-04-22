@@ -23,7 +23,7 @@ Modificado por: Mario
 
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { login } from '../services/authService' // 👈 IMPORTANTE
+import { login } from '../services/authService' // IMPORTANTE
 
 function Login() {
 
@@ -32,24 +32,48 @@ function Login() {
     const [usuario, setUsuario] = useState('')
     const [contrasena, setContrasena] = useState('')
 
-    // 🔥 LOGIN REAL
+    //LOGIN REAL
     const manejarLogin = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+
+        if (!usuario.trim() || !contrasena.trim()) {
+            alert("Debes ingresar usuario y contraseña");
+            return;
+        }
 
         try {
-            const data = await login(usuario, contrasena)
+            const data = await login(usuario, contrasena);
 
-            // guardar sesión
-            localStorage.setItem("usuario", JSON.stringify(data))
-
-            // redirigir
-            navigate('/admin')
+            localStorage.setItem("usuario", JSON.stringify(data));
+            navigate("/admin");
 
         } catch (error) {
-            console.error(error)
-            alert('Credenciales incorrectas')
+            console.error("Error en login:", error);
+
+            let mensaje = "Ocurrió un error al iniciar sesión";
+
+            if (error.response) {
+                if (error.response.status === 401) {
+                    mensaje = "Usuario o contraseña incorrectos";
+                } else if (error.response.status === 404) {
+                    mensaje = "No se encontró el servicio de login";
+                } else if (error.response.status === 500) {
+                    mensaje = "Error interno del servidor";
+                } else {
+                    mensaje =
+                        error.response.data?.message ||
+                        error.response.data?.error ||
+                        "Error al iniciar sesión";
+                }
+            } else if (error.request) {
+                mensaje = "No se pudo conectar con el servidor";
+            } else {
+                mensaje = error.message || "Error inesperado";
+            }
+
+            alert(mensaje);
         }
-    }
+    };
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
