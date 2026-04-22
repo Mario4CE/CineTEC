@@ -65,7 +65,7 @@ echo [OK] Requisitos basicos detectados.
 echo Abriendo 3 ventanas: API, Admin, Cliente...
 echo.
 
-start "CineTEC API" cmd /k "cd /d %~dp0..\CineTEC.API && dotnet run"
+start "CineTEC API" cmd /k "cd /d %API_DIR% && set ASPNETCORE_ENVIRONMENT=Development && dotnet run --no-launch-profile --urls=http://%BIND_HOST%:%API_PORT%"
 start "CineTEC Admin" cmd /k "cd /d %ADMIN_DIR% && npm run dev -- --host %BIND_HOST% --port %ADMIN_PORT%"
 
 REM Usa npx para no depender de live-server global

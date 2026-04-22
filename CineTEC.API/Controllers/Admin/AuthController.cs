@@ -1,18 +1,4 @@
-﻿/*
- Entrada: POST /api/auth/login
- Salida: 200 OK
- {
-   "mensaje": "Login correcto",
-   "usuario": "admin1",
-   "nombre": "Admin Uno",
-   "rol": "Administrador"
- }
-Descrpccion: Este endpoint permite a los administradores iniciar sesión en el sistema. Recibe un objeto JSON con las propiedades "usuario" y "contrasena".
-            Si las credenciales son correctas, devuelve un mensaje de éxito junto con la información del usuario.
-            Si las credenciales son incorrectas, devuelve un mensaje de error indicando que el usuario o la contraseña son incorrectos.
-Modificado por: Mario
-*/
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CineTec.API.Data;
 using CineTec.API.DTOs;
@@ -23,7 +9,7 @@ namespace CineTec.API.Controllers.Admin
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly CineTecDbContext _context; 
+        private readonly CineTecDbContext _context;
 
         public AuthController(CineTecDbContext context)
         {
@@ -33,12 +19,22 @@ namespace CineTec.API.Controllers.Admin
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Usuario) || string.IsNullOrWhiteSpace(dto.Contrasena))
+            {
+                return BadRequest(new { mensaje = "Usuario y contraseña son requeridos" });
+            }
+
             var admin = await _context.Administradores
-                .FirstOrDefaultAsync(a => a.Usuario == dto.Usuario && a.Contrasena == dto.Contrasena);
+                .FirstOrDefaultAsync(a => a.Usuario == dto.Usuario);
 
             if (admin == null)
             {
-                return Unauthorized(new { mensaje = "Usuario o contraseña incorrectos" });
+                return Unauthorized(new { mensaje = "Usuario no encontrado" });
+            }
+
+            if (admin.Contrasena != dto.Contrasena)
+            {
+                return Unauthorized(new { mensaje = "Contraseña incorrecta" });
             }
 
             return Ok(new
