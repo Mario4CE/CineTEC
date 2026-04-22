@@ -65,7 +65,7 @@ echo [OK] Requisitos basicos detectados.
 echo Abriendo 3 ventanas: API, Admin, Cliente...
 echo.
 
-start "CineTEC API" cmd /k "cd /d %API_DIR% && set ASPNETCORE_ENVIRONMENT=Development && dotnet run --no-launch-profile --urls=http://%BIND_HOST%:%API_PORT%"
+start "CineTEC API" cmd /k "cd /d %~dp0..\CineTEC.API && dotnet run"
 start "CineTEC Admin" cmd /k "cd /d %ADMIN_DIR% && npm run dev -- --host %BIND_HOST% --port %ADMIN_PORT%"
 
 REM Usa npx para no depender de live-server global
@@ -82,10 +82,11 @@ echo Para otro dispositivo en la misma red, usa la IP de tu PC:
 echo - Cliente: http://IP_DE_TU_PC:%CLIENT_PORT%
 echo - API:     http://IP_DE_TU_PC:%API_PORT%
 echo.
-echo IMPORTANTE: no abras http://0.0.0.0:%CLIENT_PORT% en el navegador.
+echo IMPORTANTE: no abras http://0.0.0.0:PUERTO en el navegador.
 echo.
-echo Abriendo login del cliente en tu navegador...
+echo Abriendo login del administrador y del cliente en tu navegador...
 timeout /t 4 /nobreak >nul
+start "" "http://localhost:%ADMIN_PORT%/"
 start "" "http://localhost:%CLIENT_PORT%/index.html"
 echo.
 pause
