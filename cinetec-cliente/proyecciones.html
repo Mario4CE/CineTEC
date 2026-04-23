@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Seleccionar Proyección</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+        .proyecciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .proyeccion-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .proyeccion-card:hover {
+            border-color: #e74c3c;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .proyeccion-card.seleccionada {
+            border-color: #27ae60;
+            background-color: #ecf7f0;
+        }
+
+        .hora-proyeccion {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .fecha-proyeccion {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .sala-info {
+            font-size: 12px;
+            color: #95a5a6;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-seleccionar {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .info-pelicula {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .volver-btn {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-sm">
+        <div class="card">
+            <!-- Header -->
+            <div class="card-header">
+                <h2>Selecciona una Proyección</h2>
+                <p id="detallesPelicula" style="color: #7f8c8d; margin: 5px 0 0 0;"></p>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertError" class="alert alert-error"></div>
+            <div id="alertSuccess" class="alert alert-success"></div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Cargando proyecciones...</p>
+            </div>
+
+            <!-- Contenido -->
+            <div class="card-body">
+                <!-- Botón volver -->
+                <div class="volver-btn">
+                    <button onclick="volverAPeliculas()" class="btn btn-secondary">← Cambiar Película</button>
+                </div>
+
+                <!-- Grid de proyecciones -->
+                <div id="proyeccionesGrid" class="proyecciones-grid">
+                    <!-- Las proyecciones se cargarán aquí dinámicamente -->
+                </div>
+
+                <!-- Botón continuar -->
+                <div style="margin-top: 30px; text-align: center;">
+                    <button id="btnContinuar" onclick="continuarAAsientos()" class="btn btn-primary" disabled>
+                        Continuar a Asientos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        let proyeccionSeleccionada = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            protegerRuta(); // Solo usuarios autenticados
+            
+            const peliculaId = obtenerDeLocal('peliculaSeleccionada');
+            const nombrePelicula = obtenerDeLocal('nombrePelicula');
+            const cineId = obtenerDeLocal('cineSeleccionado');
+            const nombreCine = obtenerDeLocal('nombreCine');
+
+            if (!peliculaId || !cineId) {
+                mostrarError('Información incompleta. Intenta de nuevo.');
+                setTimeout(() => redirigir('peliculas.html'), 2000);
+                return;
+            }
+
+            // Mostrar información de la película
+            document.getElementById('detallesPelicula').textContent = 
+                `${nombrePelicula} - ${nombreCine}`;
+
+            controlarLoading('loading', true);
+
+            try {
+                // Cargar todas las proyecciones
+                const respuestaProyecciones = await apiGet('admin/proyecciones');
+                const proyecciones = respuestaProyecciones || [];
+
+                // Filtrar proyecciones por película y sucursal
+                const proyeccionesDisponibles = proyecciones.filter(proy => 
+                    proy.peliculaId == peliculaId &&
+                    proy.sala &&
+                    proy.sala.sucursal &&
+                    proy.sala.sucursal.id == cineId
+                );
+
+                // Si no hay proyecciones, mostrar mensaje
+                if (proyeccionesDisponibles.length === 0) {
+                    document.getElementById('proyeccionesGrid').innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <p style="color: #999; font-size: 16px;">
+                                No hay proyecciones disponibles para esta película en este cine.
+                            </p>
+                            <p style="color: #bbb; font-size: 14px; margin-top: 10px;">
+                                Intenta seleccionar otra película o vuelve más tarde.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Ordenar por fecha
+                proyeccionesDisponibles.sort((a, b) => 
+                    new Date(a.fecha) - new Date(b.fecha)
+                );
+
+                // Mostrar proyecciones
+                mostrarProyecciones(proyeccionesDisponibles);
+
+            } catch (error) {
+                console.error('Error al cargar proyecciones:', error);
+                mostrarError('No se pudieron cargar las proyecciones. Intenta más tarde.');
+            } finally {
+                controlarLoading('loading', false);
+            }
+        });
+
+        function mostrarProyecciones(proyecciones) {
+            const grid = document.getElementById('proyeccionesGrid');
+            
+            grid.innerHTML = proyecciones.map((proy, index) => {
+                const fecha = new Date(proy.fecha);
+                const hora = fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+                const fechaFormato = fecha.toLocaleDateString('es-ES', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+
+                return `
+                    <div class="proyeccion-card" id="proyeccion-${proy.id}" 
+                         onclick="seleccionarProyeccion(${proy.id}, '${hora}', '${fechaFormato}', ${proy.salaId})">
+                        <div class="fecha-proyeccion">${fechaFormato}</div>
+                        <div class="hora-proyeccion">${hora}</div>
+                        <div class="sala-info">
+                            Sala: ${proy.sala.identificador}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function seleccionarProyeccion(proyeccionId, hora, fecha, salaId) {
+            // Desseleccionar anterior
+            if (proyeccionSeleccionada) {
+                document.getElementById(`proyeccion-${proyeccionSeleccionada.id}`).classList.remove('seleccionada');
+            }
+
+            // Seleccionar nueva
+            proyeccionSeleccionada = {
+                id: proyeccionId,
+                hora: hora,
+                fecha: fecha,
+                salaId: salaId
+            };
+
+            document.getElementById(`proyeccion-${proyeccionId}`).classList.add('seleccionada');
+            document.getElementById('btnContinuar').disabled = false;
+            mostrarExito(`Proyección seleccionada: ${hora}`);
+        }
+
+        function continuarAAsientos() {
+            if (!proyeccionSeleccionada) {
+                mostrarError('Por favor selecciona una proyección.');
+                return;
+            }
+
+            // Guardar proyección seleccionada
+            guardarEnLocal('proyeccionSeleccionada', proyeccionSeleccionada.id);
+            guardarEnLocal('horaProyeccion', proyeccionSeleccionada.hora);
+            guardarEnLocal('fechaProyeccion', proyeccionSeleccionada.fecha);
+            guardarEnLocal('salaId', proyeccionSeleccionada.salaId);
+
+            // Redirigir a asientos
+            redirigir('asientos.html');
+        }
+
+        function volverAPeliculas() {
+            limpiarLocal('proyeccionSeleccionada');
+            limpiarLocal('horaProyeccion');
+            limpiarLocal('fechaProyeccion');
+            limpiarLocal('salaId');
+            redirigir('peliculas.html');
+        }
+    </script>
+</body>
+</html>

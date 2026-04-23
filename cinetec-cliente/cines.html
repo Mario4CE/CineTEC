@@ -70,11 +70,13 @@
             document.getElementById('formCine').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const cineId = cineSelect.value;
+                const nombreCine = cineSelect.options[cineSelect.selectedIndex].text;
                 if (!cineId) {
                     mostrarError('Por favor selecciona un cine.');
                     return;
                 }
                 guardarEnLocal('cineSeleccionado', cineId);
+                guardarEnLocal('nombreCine', nombreCine);
                 redirigir('peliculas.html');
             });
         });

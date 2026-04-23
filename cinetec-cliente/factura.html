@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Factura</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+        .factura-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: white;
+            border: 2px solid #2c3e50;
+            border-radius: 8px;
+            padding: 40px;
+        }
+
+        .factura-header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .factura-titulo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .factura-numero {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .fecha-factura {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .seccion {
+            margin-bottom: 25px;
+        }
+
+        .titulo-seccion {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .fila-datos {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px dotted #ecf0f1;
+        }
+
+        .fila-datos.total {
+            font-weight: bold;
+            border-bottom: 2px solid #2c3e50;
+            padding-top: 15px;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .label {
+            color: #7f8c8d;
+        }
+
+        .valor {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .asientos-lista {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .botones-descarga {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .btn-descargar {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .btn-pdf {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-pdf:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-xml {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-xml:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-volver {
+            background-color: #95a5a6;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-volver:hover {
+            background-color: #7f8c8d;
+        }
+
+        .pie-factura {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .alerta-exito {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-sm">
+        <!-- Alerta de éxito -->
+        <div class="alerta-exito">
+            ¡Compra realizada exitosamente! 🎉
+        </div>
+
+        <!-- Factura -->
+        <div class="factura-container">
+            <div class="factura-header">
+                <p class="factura-titulo">FACTURA</p>
+                <p class="factura-numero">Factura #<span id="numeroFactura">0000001</span></p>
+                <p class="fecha-factura"><span id="fechaFactura"></span></p>
+            </div>
+
+            <!-- Información del cliente -->
+            <div class="seccion">
+                <div class="titulo-seccion">Cliente</div>
+                <div class="fila-datos">
+                    <span class="label">Nombre:</span>
+                    <span class="valor" id="nombreCliente"></span>
+                </div>
+                <div class="fila-datos">
+                    <span class="label">Cédula:</span>
+                    <span class="valor" id="cedulaCliente"></span>
+                </div>
+            </div>
+
+            <!-- Información de la película -->
+            <div class="seccion">
+                <div class="titulo-seccion">Detalles de la Reservación</div>
+                <div class="fila-datos">
+                    <span class="label">Película:</span>
+                    <span class="valor" id="nombrePelicula"></span>
+                </div>
+                <div class="fila-datos">
+                    <span class="label">Fecha y Hora:</span>
+                    <span class="valor" id="fechaHoraProyeccion"></span>
+                </div>
+                <div class="fila-datos">
+                    <span class="label">Cine:</span>
+                    <span class="valor" id="nombreCine"></span>
+                </div>
+            </div>
+
+            <!-- Asientos -->
+            <div class="seccion">
+                <div class="titulo-seccion">Asientos</div>
+                <div class="asientos-lista" id="asientosLista"></div>
+            </div>
+
+            <!-- Detalles de pago -->
+            <div class="seccion">
+                <div class="titulo-seccion">Detalles de Pago</div>
+                <div class="fila-datos">
+                    <span class="label">Cantidad de Asientos:</span>
+                    <span class="valor" id="cantidadAsientos">0</span>
+                </div>
+                <div class="fila-datos">
+                    <span class="label">Precio por Asiento:</span>
+                    <span class="valor">₡8,000.00</span>
+                </div>
+                <div class="fila-datos total">
+                    <span>TOTAL:</span>
+                    <span>₡<span id="totalPrecio">0</span></span>
+                </div>
+            </div>
+
+            <!-- Botones de descarga -->
+            <div class="botones-descarga">
+                <button class="btn-descargar btn-pdf" onclick="descargarPDF()">
+                    📄 Descargar PDF
+                </button>
+                <button class="btn-descargar btn-xml" onclick="descargarXML()">
+                    📋 Descargar XML
+                </button>
+            </div>
+
+            <!-- Botón volver -->
+            <div style="text-align: center;">
+                <button class="btn-descargar btn-volver" onclick="volverAlInicio()">
+                    ← Ir al Inicio
+                </button>
+            </div>
+
+            <div class="pie-factura">
+                <p>Gracias por tu compra en CineTec</p>
+                <p>Este documento es válido como comprobante de pago</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluir librerías para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        let datosFactura = {};
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            protegerRuta(); // Solo usuarios autenticados
+            
+            // Obtener datos del localStorage
+            const nombrePelicula = obtenerDeLocal('nombrePelicula');
+            const horaProyeccion = obtenerDeLocal('horaProyeccion');
+            const fechaProyeccion = obtenerDeLocal('fechaProyeccion');
+            const nombreCine = obtenerDeLocal('nombreCine');
+            const asientosSeleccionados = JSON.parse(obtenerDeLocal('asientosSeleccionados') || '[]');
+            const totalCompra = parseInt(obtenerDeLocal('totalCompra') || '0');
+            const usuarioData = JSON.parse(obtenerDeLocal('usuario') || '{}');
+
+            // Validar datos
+            if (!nombrePelicula || !horaProyeccion || asientosSeleccionados.length === 0) {
+                mostrarError('Información incompleta.');
+                setTimeout(() => redirigir('cines.html'), 2000);
+                return;
+            }
+
+            // Generar número de factura único (simulado con timestamp)
+            const numeroFactura = `FC${Date.now().toString().slice(-7)}`;
+
+            // Guardar datos para descargas
+            datosFactura = {
+                numeroFactura,
+                fechaEmision: new Date().toLocaleDateString('es-ES'),
+                nombreCliente: usuarioData.nombreCompleto || 'Cliente',
+                cedulaCliente: usuarioData.cedula || 'N/A',
+                nombrePelicula,
+                horaProyeccion,
+                fechaProyeccion,
+                nombreCine,
+                asientos: asientosSeleccionados,
+                cantidad: asientosSeleccionados.length,
+                precioUnitario: 8000,
+                total: totalCompra
+            };
+
+            // Llenar formulario
+            document.getElementById('numeroFactura').textContent = numeroFactura;
+            document.getElementById('fechaFactura').textContent = new Date().toLocaleDateString('es-ES');
+            document.getElementById('nombreCliente').textContent = datosFactura.nombreCliente;
+            document.getElementById('cedulaCliente').textContent = datosFactura.cedulaCliente;
+            document.getElementById('nombrePelicula').textContent = nombrePelicula;
+            document.getElementById('fechaHoraProyeccion').textContent = `${fechaProyeccion} ${horaProyeccion}`;
+            document.getElementById('nombreCine').textContent = nombreCine;
+            document.getElementById('asientosLista').textContent = asientosSeleccionados.join(', ');
+            document.getElementById('cantidadAsientos').textContent = asientosSeleccionados.length;
+            document.getElementById('totalPrecio').textContent = totalCompra.toLocaleString();
+        });
+
+        function descargarPDF() {
+            const elemento = document.querySelector('.factura-container');
+            const opciones = {
+                margin: 10,
+                filename: `Factura_${datosFactura.numeroFactura}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opciones).from(elemento).save();
+            mostrarExito('PDF descargado correctamente');
+        }
+
+        function descargarXML() {
+            // Crear contenido XML siguiendo especificaciones de Hacienda de Costa Rica
+            const xmlContent = generarXML();
+
+            // Crear blob y descargar
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Factura_${datosFactura.numeroFactura}.xml`;
+            link.click();
+            window.URL.revokeObjectURL(url);
+
+            mostrarExito('XML descargado correctamente');
+        }
+
+        function generarXML() {
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<Factura>
+    <NumeroFactura>${datosFactura.numeroFactura}</NumeroFactura>
+    <FechaEmision>${datosFactura.fechaEmision}</FechaEmision>
+    <Empresa>
+        <Nombre>CineTEC</Nombre>
+        <Identificacion>3-101-123456</Identificacion>
+    </Empresa>
+    <Cliente>
+        <Nombre>${datosFactura.nombreCliente}</Nombre>
+        <Cedula>${datosFactura.cedulaCliente}</Cedula>
+    </Cliente>
+    <Detalles>
+        <Detalle>
+            <LineaDetalle>1</LineaDetalle>
+            <Descripcion>${datosFactura.nombrePelicula} - ${datosFactura.asientos.join(', ')}</Descripcion>
+            <Cantidad>${datosFactura.cantidad}</Cantidad>
+            <PrecioUnitario>${datosFactura.precioUnitario}</PrecioUnitario>
+            <Moneda>CRC</Moneda>
+            <SubTotal>${datosFactura.total}</SubTotal>
+        </Detalle>
+    </Detalles>
+    <Resumen>
+        <TotalLineasServicio>1</TotalLineasServicio>
+        <TotalDescuentos>0</TotalDescuentos>
+        <TotalGravado>${datosFactura.total}</TotalGravado>
+        <TotalExento>0</TotalExento>
+        <TotalImpuestos>0</TotalImpuestos>
+        <TotalComprobante>${datosFactura.total}</TotalComprobante>
+    </Resumen>
+    <Proyeccion>
+        <Pelicula>${datosFactura.nombrePelicula}</Pelicula>
+        <Fecha>${datosFactura.fechaProyeccion}</Fecha>
+        <Hora>${datosFactura.horaProyeccion}</Hora>
+        <Cine>${datosFactura.nombreCine}</Cine>
+        <Asientos>${datosFactura.asientos.join(', ')}</Asientos>
+    </Proyeccion>
+</Factura>`;
+
+            return xml;
+        }
+
+        function volverAlInicio() {
+            // Limpiar localStorage
+            limpiarLocal('cineSeleccionado');
+            limpiarLocal('nombreCine');
+            limpiarLocal('peliculaSeleccionada');
+            limpiarLocal('nombrePelicula');
+            limpiarLocal('proyeccionSeleccionada');
+            limpiarLocal('horaProyeccion');
+            limpiarLocal('fechaProyeccion');
+            limpiarLocal('salaId');
+            limpiarLocal('asientosSeleccionados');
+            limpiarLocal('totalCompra');
+
+            // Redirigir al inicio
+            redirigir('cines.html');
+        }
+    </script>
+</body>
+</html>
