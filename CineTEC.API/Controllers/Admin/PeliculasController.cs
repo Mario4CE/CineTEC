@@ -106,10 +106,25 @@ namespace CineTec.API.Controllers.Admin
                 return BadRequest(new { mensaje = "Formato no permitido. Use JPG, PNG o WEBP" });
             }
 
-            var carpetaImagenes = Path.Combine(_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "peliculas");
+            var carpetaImagenes = Path.Combine(
+                _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+                "images",
+                "peliculas"
+            );
+
             Directory.CreateDirectory(carpetaImagenes);
 
-            var nombreArchivo = $"{Guid.NewGuid():N}{extension}";
+            // Nombre original sin extensión
+            var nombreOriginal = Path.GetFileNameWithoutExtension(archivo.FileName);
+
+            // Limpiar caracteres inválidos
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                nombreOriginal = nombreOriginal.Replace(c, '_');
+            }
+
+            // Agregar un GUID para que no se repita
+            var nombreArchivo = $"{nombreOriginal}{extension}";
             var rutaFisica = Path.Combine(carpetaImagenes, nombreArchivo);
 
             await using var stream = new FileStream(rutaFisica, FileMode.Create);
