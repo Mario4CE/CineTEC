@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Seleccionar Asientos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+        .contenedor-asientos {
+            margin-top: 20px;
+        }
+
+        .pantalla {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .asientos-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .fila-asientos {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .numero-fila {
+            width: 30px;
+            text-align: right;
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .asiento {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .asiento.disponible {
+            background-color: #2ecc71;
+            border-color: #27ae60;
+            color: white;
+        }
+
+        .asiento.disponible:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 6px rgba(46, 204, 113, 0.4);
+        }
+
+        .asiento.ocupado {
+            background-color: #95a5a6;
+            border-color: #7f8c8d;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .asiento.restringido {
+            background-color: #f39c12;
+            border-color: #e67e22;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .asiento.seleccionado {
+            background-color: #3498db;
+            border-color: #2980b9;
+            color: white;
+            box-shadow: 0 2px 6px rgba(52, 152, 219, 0.6);
+            transform: scale(1.1);
+        }
+
+        .leyenda {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .leyenda-color {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .leyenda-color.disponible {
+            background-color: #2ecc71;
+            border-color: #27ae60;
+        }
+
+        .leyenda-color.ocupado {
+            background-color: #95a5a6;
+            border-color: #7f8c8d;
+            opacity: 0.6;
+        }
+
+        .leyenda-color.restringido {
+            background-color: #f39c12;
+            border-color: #e67e22;
+        }
+
+        .leyenda-color.seleccionado {
+            background-color: #3498db;
+            border-color: #2980b9;
+        }
+
+        .resumen-compra {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .asientos-seleccionados {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .precio-total {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .botones-accion {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .volver-btn {
+            margin-bottom: 20px;
+        }
+
+        .info-pelicula {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-sm">
+        <div class="card">
+            <!-- Header -->
+            <div class="card-header">
+                <h2>Selecciona tus Asientos</h2>
+                <p id="detallesProyeccion" style="color: #7f8c8d; margin: 5px 0 0 0;"></p>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertError" class="alert alert-error"></div>
+            <div id="alertSuccess" class="alert alert-success"></div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Cargando sala...</p>
+            </div>
+
+            <!-- Contenido -->
+            <div class="card-body">
+                <!-- Botón volver -->
+                <div class="volver-btn">
+                    <button onclick="volverAProyecciones()" class="btn btn-secondary">← Cambiar Proyección</button>
+                </div>
+
+                <!-- Información de película -->
+                <div class="info-pelicula" id="infoPelicula"></div>
+
+                <!-- Pantalla -->
+                <div class="pantalla">🎬 PANTALLA 🎬</div>
+
+                <!-- Asientos -->
+                <div class="contenedor-asientos" id="contenedorAsientos">
+                    <div class="asientos-grid" id="asientosGrid"></div>
+                </div>
+
+                <!-- Leyenda -->
+                <div class="leyenda">
+                    <div class="leyenda-item">
+                        <div class="leyenda-color disponible"></div>
+                        <span>Disponible</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color seleccionado"></div>
+                        <span>Seleccionado</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color ocupado"></div>
+                        <span>Ocupado</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-color restringido"></div>
+                        <span>Restringido</span>
+                    </div>
+                </div>
+
+                <!-- Resumen -->
+                <div class="resumen-compra" id="resumenCompra">
+                    <div class="asientos-seleccionados">
+                        Asientos seleccionados: <span id="asientosCount">0</span>
+                    </div>
+                    <div class="precio-total">
+                        Total: ₡<span id="precioTotal">0</span>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="botones-accion">
+                    <button onclick="volverAProyecciones()" class="btn btn-secondary">Cancelar</button>
+                    <button id="btnComprar" onclick="comprarBoletos()" class="btn btn-primary" disabled>
+                        Comprar Boletos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        const PRECIO_ASIENTO = 8000; // Precio en colones
+        let asientosSeleccionados = new Set();
+        let datosAsientos = {};
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            protegerRuta(); // Solo usuarios autenticados
+            
+            const salaId = obtenerDeLocal('salaId');
+            const proyeccionId = obtenerDeLocal('proyeccionSeleccionada');
+            const nombrePelicula = obtenerDeLocal('nombrePelicula');
+            const horaProyeccion = obtenerDeLocal('horaProyeccion');
+            const fechaProyeccion = obtenerDeLocal('fechaProyeccion');
+
+            if (!salaId || !proyeccionId) {
+                mostrarError('Información incompleta. Intenta de nuevo.');
+                setTimeout(() => redirigir('proyecciones.html'), 2000);
+                return;
+            }
+
+            // Mostrar información
+            document.getElementById('detallesProyeccion').textContent = 
+                `${nombrePelicula} - ${fechaProyeccion} ${horaProyeccion}`;
+            document.getElementById('infoPelicula').innerHTML = `
+                <strong>${nombrePelicula}</strong><br>
+                ${fechaProyeccion} a las ${horaProyeccion}
+            `;
+
+            controlarLoading('loading', true);
+
+            try {
+                // Cargar información de la sala
+                const respuestaSalas = await apiGet('admin/salas');
+                const salas = respuestaSalas || [];
+                const sala = salas.find(s => s.id == salaId);
+
+                if (!sala) {
+                    mostrarError('No se pudo cargar la información de la sala.');
+                    return;
+                }
+
+                datosAsientos = sala;
+
+                // Simular ocupación de asientos (aleatorio)
+                generarAsientos(sala);
+
+            } catch (error) {
+                console.error('Error al cargar sala:', error);
+                mostrarError('No se pudo cargar la sala. Intenta más tarde.');
+            } finally {
+                controlarLoading('loading', false);
+            }
+        });
+
+        function generarAsientos(sala) {
+            const grid = document.getElementById('asientosGrid');
+            const filas = sala.filas;
+            const columnas = sala.columnas;
+
+            // Simular estado de asientos: 
+            // 30% ocupados, 10% restringidos, 60% disponibles
+            const ocupados = new Set();
+            const restringidos = new Set();
+
+            // Asientos ocupados aleatorios
+            for (let i = 0; i < Math.ceil(filas * columnas * 0.3); i++) {
+                const fila = Math.floor(Math.random() * filas);
+                const col = Math.floor(Math.random() * columnas);
+                ocupados.add(`${fila}-${col}`);
+            }
+
+            // Asientos restringidos aleatorios
+            for (let i = 0; i < Math.ceil(filas * columnas * 0.1); i++) {
+                const fila = Math.floor(Math.random() * filas);
+                const col = Math.floor(Math.random() * columnas);
+                if (!ocupados.has(`${fila}-${col}`)) {
+                    restringidos.add(`${fila}-${col}`);
+                }
+            }
+
+            let html = '';
+            for (let fila = 0; fila < filas; fila++) {
+                html += '<div class="fila-asientos">';
+                html += `<div class="numero-fila">${String.fromCharCode(65 + fila)}</div>`;
+
+                for (let col = 0; col < columnas; col++) {
+                    const id = `${fila}-${col}`;
+                    let estado = 'disponible';
+
+                    if (ocupados.has(id)) {
+                        estado = 'ocupado';
+                    } else if (restringidos.has(id)) {
+                        estado = 'restringido';
+                    }
+
+                    const asientoNumero = String.fromCharCode(65 + fila) + (col + 1);
+                    html += `
+                        <div class="asiento ${estado}" id="asiento-${id}" 
+                             onclick="toggleAsiento('${id}', '${asientoNumero}', '${estado}')">
+                            ${col + 1}
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function toggleAsiento(id, numero, estado) {
+            if (estado !== 'disponible') {
+                mostrarError(`El asiento ${numero} no está disponible.`);
+                return;
+            }
+
+            const elemento = document.getElementById(`asiento-${id}`);
+
+            if (asientosSeleccionados.has(id)) {
+                asientosSeleccionados.delete(id);
+                elemento.classList.remove('seleccionado');
+            } else {
+                asientosSeleccionados.add(id);
+                elemento.classList.add('seleccionado');
+            }
+
+            actualizarResumen();
+        }
+
+        function actualizarResumen() {
+            const cantidad = asientosSeleccionados.size;
+            const total = cantidad * PRECIO_ASIENTO;
+
+            document.getElementById('asientosCount').textContent = cantidad;
+            document.getElementById('precioTotal').textContent = total.toLocaleString();
+
+            document.getElementById('btnComprar').disabled = cantidad === 0;
+        }
+
+        function comprarBoletos() {
+            if (asientosSeleccionados.size === 0) {
+                mostrarError('Por favor selecciona al menos un asiento.');
+                return;
+            }
+
+            // Convertir Set a Array y guardar
+            const asientos = Array.from(asientosSeleccionados).map(id => {
+                const [fila, col] = id.split('-');
+                const fila_letra = String.fromCharCode(65 + parseInt(fila));
+                return `${fila_letra}${parseInt(col) + 1}`;
+            });
+
+            guardarEnLocal('asientosSeleccionados', JSON.stringify(asientos));
+            guardarEnLocal('totalCompra', asientosSeleccionados.size * PRECIO_ASIENTO);
+
+            // Redirigir a factura
+            redirigir('factura.html');
+        }
+
+        function volverAProyecciones() {
+            limpiarLocal('asientosSeleccionados');
+            limpiarLocal('totalCompra');
+            redirigir('proyecciones.html');
+        }
+    </script>
+</body>
+</html>
