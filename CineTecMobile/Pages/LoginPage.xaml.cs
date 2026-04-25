@@ -24,7 +24,7 @@ public partial class LoginPage : ContentPage
             using var client = new HttpClient();
 
             // endpoint
-            var response = await client.GetAsync($"http://192.168.100.21:5000/api/usuarios/cedula/{cedula}");
+            var response = await client.GetAsync($"http://192.168.0.14:5000/api/usuarios/cedula/{cedula}");
 
             if (!response.IsSuccessStatusCode)
             {
