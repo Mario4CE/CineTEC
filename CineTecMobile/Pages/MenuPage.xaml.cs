@@ -19,7 +19,7 @@ public partial class MenuPage : ContentPage
 
     private async void OnCinesClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//CinesPage");
+        await Shell.Current.GoToAsync("CinesPage");
     }
 
     private async void OnMisBoletosClicked(object sender, EventArgs e)

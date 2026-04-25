@@ -8,5 +8,7 @@ public partial class AppShell : Shell
 
         Routing.RegisterRoute("MenuPage", typeof(Pages.MenuPage));
         Routing.RegisterRoute("CinesPage", typeof(Pages.CinesPage));
+
     }
+
 }
