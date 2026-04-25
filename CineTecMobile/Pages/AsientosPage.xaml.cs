@@ -32,13 +32,13 @@ public partial class AsientosPage : ContentPage
         AsientosGrid.ColumnDefinitions.Clear();
         AsientosGrid.Children.Clear();
 
-        // 🔥 FILAS
+        // filas
         for (int i = 0; i < filas; i++)
         {
             AsientosGrid.RowDefinitions.Add(new RowDefinition { Height = 40 });
         }
 
-        // 🔥 COLUMNAS
+        // columnas
         // Primera columna = letras
         AsientosGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = 30 });
 
@@ -52,7 +52,7 @@ public partial class AsientosPage : ContentPage
 
         for (int fila = 0; fila < filas; fila++)
         {
-            // 🔤 LETRA (A, B, C...)
+            //  letra (A, B, C...)
             var labelFila = new Label
             {
                 Text = ((char)('A' + fila)).ToString(),
@@ -65,14 +65,14 @@ public partial class AsientosPage : ContentPage
 
             AsientosGrid.Add(labelFila, 0, fila);
 
-            // 🎫 ASIENTOS
+            // asientos
             for (int col = 0; col < columnas; col++)
             {
                 string id = $"{fila}-{col}";
 
                 var btn = new Button
                 {
-                    Text = (col + 1).ToString(), // 🔥 numeración correcta
+                    Text = (col + 1).ToString(), // numeración correcta
                     FontSize = 10,
                     WidthRequest = 35,
                     HeightRequest = 35,
@@ -94,7 +94,7 @@ public partial class AsientosPage : ContentPage
                     btn.Clicked += (s, e) => ToggleAsiento(btn, id);
                 }
 
-                // 🔥 IMPORTANTE: col + 1 (porque 0 es la letra)
+                // col + 1 (porque 0 es la letra)
                 AsientosGrid.Add(btn, col + 1, fila);
             }
         }
