@@ -1,0 +1,45 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.RegistroPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="CineTec"
+                   FontSize="28"
+                   HorizontalOptions="Center"/>
+
+            <Label Text="Crea tu cuenta y comienza a reservar"
+                   FontSize="14"
+                   HorizontalOptions="Center"/>
+
+            <!-- Inputs -->
+            <Entry x:Name="NombreEntry" Placeholder="Nombre" />
+            <Entry x:Name="ApellidoEntry" Placeholder="Apellido" />
+            <Entry x:Name="CedulaEntry" Placeholder="Cédula" Keyboard="Numeric"/>
+            <Entry x:Name="TelefonoEntry" Placeholder="Teléfono (Opcional)" Keyboard="Telephone"/>
+
+            <DatePicker x:Name="FechaNacimientoPicker" />
+
+            <!-- Botón -->
+            <Button Text="Registrarse"
+                    Clicked="OnRegisterClicked"/>
+
+            <!-- Mensajes -->
+            <Label x:Name="MensajeLabel"
+                   TextColor="Red"
+                   IsVisible="False"/>
+
+            <!-- Login -->
+            <Label Text="¿Ya tienes cuenta? Inicia sesión"
+                   HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnLoginTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
