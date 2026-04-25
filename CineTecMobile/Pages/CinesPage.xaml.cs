@@ -38,7 +38,7 @@ public partial class CinesPage : ContentPage
             using var client = new HttpClient();
 
             // Endpoint real
-            var response = await client.GetAsync("http://localhost:5000/api/sucursales");
+            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Sucursales");
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Error al obtener cines");
@@ -46,7 +46,10 @@ public partial class CinesPage : ContentPage
             var json = await response.Content.ReadAsStringAsync();
 
             // Convertir JSON a objetos
-            listaCines = JsonSerializer.Deserialize<List<Cine>>(json);
+            listaCines = JsonSerializer.Deserialize<List<Cine>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             // Llenar el Picker
             CinePicker.ItemsSource = listaCines;
@@ -85,6 +88,6 @@ public partial class CinesPage : ContentPage
         Preferences.Set("cineNombre", cineSeleccionado.Nombre);
 
         // Navegar a la siguiente pantalla
-        await DisplayAlert("Cine seleccionado", cineSeleccionado.Nombre, "OK");
+        await Shell.Current.GoToAsync("PeliculasPage");
     }
 }

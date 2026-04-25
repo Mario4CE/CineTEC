@@ -14,7 +14,7 @@ public class CineService
 
     public async Task<List<Cine>> GetCines()
     {
-        string url = "http://192.168.1.117:5000/api/Sucursales";
+        string url = "http://192.168.100.21:5000/api/Sucursales";
 
         var response = await _httpClient.GetStringAsync(url);
 
