@@ -1,4 +1,5 @@
 using CineTec.API.Data;
+using CineTec.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<CineTecDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Registrar servicios
+builder.Services.AddScoped<UsuarioService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -28,6 +32,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseCors("PermitirTodo");
 

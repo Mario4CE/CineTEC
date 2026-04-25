@@ -33,27 +33,30 @@ import {
 } from "../services/sucursalesService";
 
 function Sucursales() {
-
-    // Estado principal (lista de sucursales)
     const [sucursales, setSucursales] = useState([]);
-
-    // Estados para edición
     const [modoEdicion, setModoEdicion] = useState(false);
     const [idEditar, setIdEditar] = useState(null);
 
-    // Estado del formulario
     const [form, setForm] = useState({
         nombre: "",
         ubicacion: "",
         cantidadSalas: ""
     });
 
-    // Se ejecuta al cargar el componente
+    const provincias = [
+        "San José",
+        "Alajuela",
+        "Cartago",
+        "Heredia",
+        "Guanacaste",
+        "Puntarenas",
+        "Limón"
+    ];
+
     useEffect(() => {
         cargarSucursales();
     }, []);
 
-    // Cargar sucursales desde el backend
     const cargarSucursales = async () => {
         try {
             const data = await obtenerSucursales();
@@ -63,7 +66,6 @@ function Sucursales() {
         }
     };
 
-    // Manejar cambios en el formulario
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         setForm({
@@ -72,7 +74,6 @@ function Sucursales() {
         });
     };
 
-    // Limpiar formulario
     const limpiarFormulario = () => {
         setForm({
             nombre: "",
@@ -83,7 +84,6 @@ function Sucursales() {
         setIdEditar(null);
     };
 
-    // Enviar formulario (crear o actualizar)
     const manejarSubmit = async (e) => {
         e.preventDefault();
 
@@ -94,11 +94,9 @@ function Sucursales() {
 
         try {
             if (modoEdicion) {
-                // Actualizar sucursal
                 await actualizarSucursal(idEditar, payload);
                 alert("Sucursal actualizada correctamente");
             } else {
-                // Crear sucursal
                 await crearSucursal(payload);
                 alert("Sucursal agregada correctamente");
             }
@@ -111,7 +109,6 @@ function Sucursales() {
         }
     };
 
-    // Cargar datos para editar
     const editarSucursal = (s) => {
         setModoEdicion(true);
         setIdEditar(s.id);
@@ -123,7 +120,6 @@ function Sucursales() {
         });
     };
 
-    // Eliminar sucursal
     const eliminarSucursal = async (id) => {
         if (!window.confirm("¿Desea eliminar esta sucursal?")) return;
 
@@ -139,11 +135,8 @@ function Sucursales() {
 
     return (
         <div>
-
-            {/* Título */}
             <h2 className="mb-4">Gestión de Sucursales</h2>
 
-            {/* Formulario */}
             <div className="card shadow-sm p-4 mb-4">
                 <h4 className="mb-3">
                     {modoEdicion ? "Editar Sucursal" : "Agregar Sucursal"}
@@ -151,40 +144,66 @@ function Sucursales() {
 
                 <form onSubmit={manejarSubmit}>
                     <div className="row">
-
-                        {/* Nombre */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Nombre</label>
-                            <input type="text" className="form-control" name="nombre" value={form.nombre} onChange={manejarCambio} required />
+                            <input
+                                type="text"
+                                className="form-control"
+                                name="nombre"
+                                value={form.nombre}
+                                onChange={manejarCambio}
+                                required
+                            />
                         </div>
 
-                        {/* Ubicación */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Ubicación</label>
-                            <input type="text" className="form-control" name="ubicacion" value={form.ubicacion} onChange={manejarCambio} required />
+                            <select
+                                className="form-select"
+                                name="ubicacion"
+                                value={form.ubicacion}
+                                onChange={manejarCambio}
+                                required
+                            >
+                                <option value="">Seleccione una provincia</option>
+                                {provincias.map((provincia) => (
+                                    <option key={provincia} value={provincia}>
+                                        {provincia}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
-                        {/* Cantidad de salas */}
                         <div className="col-md-4 mb-3">
                             <label className="form-label">Cantidad de salas</label>
-                            <input type="number" className="form-control" name="cantidadSalas" value={form.cantidadSalas} onChange={manejarCambio} required min="0" />
+                            <input
+                                type="number"
+                                className="form-control"
+                                name="cantidadSalas"
+                                value={form.cantidadSalas}
+                                onChange={manejarCambio}
+                                required
+                                min="0"
+                            />
                         </div>
                     </div>
 
-                    {/* Botones */}
                     <div className="d-flex gap-2">
                         <button type="submit" className="btn btn-dark">
                             {modoEdicion ? "Actualizar" : "Guardar"}
                         </button>
 
-                        <button type="button" className="btn btn-secondary" onClick={limpiarFormulario}>
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={limpiarFormulario}
+                        >
                             Limpiar
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Tabla */}
             <div className="card shadow-sm p-4">
                 <h4 className="mb-3">Lista de Sucursales</h4>
 
@@ -210,10 +229,16 @@ function Sucursales() {
                                         <td>{s.cantidadSalas}</td>
                                         <td>
                                             <div className="d-flex gap-2">
-                                                <button className="btn btn-warning btn-sm" onClick={() => editarSucursal(s)}>
+                                                <button
+                                                    className="btn btn-warning btn-sm"
+                                                    onClick={() => editarSucursal(s)}
+                                                >
                                                     Editar
                                                 </button>
-                                                <button className="btn btn-danger btn-sm" onClick={() => eliminarSucursal(s.id)}>
+                                                <button
+                                                    className="btn btn-danger btn-sm"
+                                                    onClick={() => eliminarSucursal(s.id)}
+                                                >
                                                     Eliminar
                                                 </button>
                                             </div>

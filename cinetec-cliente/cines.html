@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Selección de Cine</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="container-sm mt-30">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2>Selecciona tu Cine</h2>
+                <p>Elige la sucursal donde deseas ver tu película</p>
+            </div>
+            <div class="card-body">
+                <!-- Alertas -->
+                <div id="alertError" class="alert alert-error"></div>
+                <div id="alertSuccess" class="alert alert-success"></div>
+
+                <!-- Loading -->
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando cines...</p>
+                </div>
+
+                <!-- Lista de cines -->
+                <form id="formCine">
+                    <div class="form-group">
+                        <label for="cineSelect">Sucursal</label>
+                        <select id="cineSelect" name="cineSelect" required>
+                            <option value="">Selecciona un cine...</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Continuar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            protegerRuta(); // Solo usuarios autenticados
+            controlarLoading('loading', true);
+            const alertError = document.getElementById('alertError');
+            const cineSelect = document.getElementById('cineSelect');
+
+            // Cargar cines desde la API
+            try {
+                const respuesta = await apiGet('sucursales');
+                console.log('Respuesta de sucursales:', respuesta);
+                const cines = respuesta.sucursales || respuesta || [];
+                console.log('Cines a mostrar:', cines);
+                cineSelect.innerHTML = '<option value="">Selecciona un cine...</option>';
+                cines.forEach(cine => {
+                    console.log('Agregando cine:', cine);
+                    cineSelect.innerHTML += `<option value="${cine.id}">${cine.nombre} - ${cine.ubicacion || ''}</option>`;
+                });
+            } catch (error) {
+                console.error('Error al cargar cines:', error);
+                mostrarError('No se pudieron cargar los cines. Intenta más tarde.');
+            } finally {
+                controlarLoading('loading', false);
+            }
+
+            // Manejar selección de cine
+            document.getElementById('formCine').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const cineId = cineSelect.value;
+                const nombreCine = cineSelect.options[cineSelect.selectedIndex].text;
+                if (!cineId) {
+                    mostrarError('Por favor selecciona un cine.');
+                    return;
+                }
+                guardarEnLocal('cineSeleccionado', cineId);
+                guardarEnLocal('nombreCine', nombreCine);
+                redirigir('peliculas.html');
+            });
+        });
+    </script>
+</body>
+</html>

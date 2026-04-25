@@ -1,0 +1,46 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.ProyeccionesPage">
+
+    <VerticalStackLayout Padding="10" Spacing="10">
+
+        <!-- Título -->
+        <Label Text="Selecciona una Proyección"
+               FontSize="24"
+               HorizontalOptions="Center"/>
+
+        <Label x:Name="InfoLabel"
+               HorizontalOptions="Center"/>
+
+        <!-- Lista -->
+        <CollectionView x:Name="ProyeccionesList">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" Padding="10">
+
+                        <VerticalStackLayout>
+
+                            <Label Text="{Binding FechaFormateada}"
+                                   FontSize="14"/>
+
+                            <Label Text="{Binding HoraFormateada}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"/>
+
+                            <Label Text="{Binding SalaInfo}"/>
+
+                            <Button Text="Seleccionar"
+                                    Clicked="OnSeleccionarClicked"/>
+
+                        </VerticalStackLayout>
+
+                    </Frame>
+                </DataTemplate>
+
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+</ContentPage>

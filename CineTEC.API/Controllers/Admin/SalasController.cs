@@ -52,9 +52,24 @@ namespace CineTec.API.Controllers.Admin
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] SalaDto dto)
         {
-            var sucursalExiste = await _context.Sucursales.AnyAsync(s => s.Id == dto.SucursalId);
-            if (!sucursalExiste)
+            var sucursal = await _context.Sucursales
+                .FirstOrDefaultAsync(s => s.Id == dto.SucursalId);
+
+            if (sucursal == null)
                 return BadRequest(new { mensaje = "La sucursal no existe" });
+
+            // Contar cuántas salas ya tiene esa sucursal
+            var cantidadActualSalas = await _context.Salas
+                .CountAsync(s => s.SucursalId == dto.SucursalId);
+
+            // Validar límite
+            if (cantidadActualSalas >= sucursal.CantidadSalas)
+            {
+                return BadRequest(new
+                {
+                    mensaje = $"No se pueden agregar más salas. La sucursal '{sucursal.Nombre}' tiene un límite de {sucursal.CantidadSalas} salas."
+                });
+            }
 
             var sala = new Sala
             {
@@ -79,9 +94,26 @@ namespace CineTec.API.Controllers.Admin
             if (sala == null)
                 return NotFound(new { mensaje = "Sala no encontrada" });
 
-            var sucursalExiste = await _context.Sucursales.AnyAsync(s => s.Id == dto.SucursalId);
-            if (!sucursalExiste)
+            var sucursal = await _context.Sucursales
+                .FirstOrDefaultAsync(s => s.Id == dto.SucursalId);
+
+            if (sucursal == null)
                 return BadRequest(new { mensaje = "La sucursal no existe" });
+
+            // Si la sala se mueve a otra sucursal, validar cupo
+            if (sala.SucursalId != dto.SucursalId)
+            {
+                var cantidadActualSalas = await _context.Salas
+                    .CountAsync(s => s.SucursalId == dto.SucursalId);
+
+                if (cantidadActualSalas >= sucursal.CantidadSalas)
+                {
+                    return BadRequest(new
+                    {
+                        mensaje = $"No se puede mover la sala. La sucursal '{sucursal.Nombre}' ya alcanzó su límite de {sucursal.CantidadSalas} salas."
+                    });
+                }
+            }
 
             sala.Identificador = dto.Identificador;
             sala.SucursalId = dto.SucursalId;

@@ -22,6 +22,7 @@ Modificado por: Mario
 */
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using CineTec.API.Data;
 using CineTec.API.DTOs;
@@ -40,12 +41,14 @@ namespace CineTec.API.Controllers.Admin
     {
         // Contexto de base de datos para acceder a las tablas
         private readonly CineTecDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
         // Constructor del controlador
         // Aquí se inyecta el DbContext para poder usar la base de datos
-        public PeliculasController(CineTecDbContext context)
+        public PeliculasController(CineTecDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         // ============================================
@@ -80,6 +83,60 @@ namespace CineTec.API.Controllers.Admin
 
             // Si existe, retorna 200 con la película
             return Ok(pelicula);
+        }
+
+
+        // ============================================
+        // POST: /api/admin/peliculas/upload-imagen
+        // Sube una imagen y devuelve la ruta pública
+        // ============================================
+        [HttpPost("upload-imagen")]
+        public async Task<IActionResult> UploadImagen([FromForm] IFormFile archivo)
+        {
+            if (archivo == null || archivo.Length == 0)
+            {
+                return BadRequest(new { mensaje = "Debe seleccionar una imagen" });
+            }
+
+            var extensionesPermitidas = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(archivo.FileName).ToLowerInvariant();
+
+            if (!extensionesPermitidas.Contains(extension))
+            {
+                return BadRequest(new { mensaje = "Formato no permitido. Use JPG, PNG o WEBP" });
+            }
+
+            var carpetaImagenes = Path.Combine(
+                _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+                "images",
+                "peliculas"
+            );
+
+            Directory.CreateDirectory(carpetaImagenes);
+
+            // Nombre original sin extensión
+            var nombreOriginal = Path.GetFileNameWithoutExtension(archivo.FileName);
+
+            // Limpiar caracteres inválidos
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                nombreOriginal = nombreOriginal.Replace(c, '_');
+            }
+
+            // Agregar un GUID para que no se repita
+            var nombreArchivo = $"{nombreOriginal}{extension}";
+            var rutaFisica = Path.Combine(carpetaImagenes, nombreArchivo);
+
+            await using var stream = new FileStream(rutaFisica, FileMode.Create);
+            await archivo.CopyToAsync(stream);
+
+            var rutaPublica = $"/images/peliculas/{nombreArchivo}";
+
+            return Ok(new
+            {
+                mensaje = "Imagen subida correctamente",
+                ruta = rutaPublica
+            });
         }
 
         // ============================================

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTec - Películas en Cartelera</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/login.css">
+    <style>
+        .peliculas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .pelicula-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pelicula-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .pelicula-imagen {
+            width: 100%;
+            height: 250px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .pelicula-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pelicula-info {
+            padding: 15px;
+        }
+
+        .pelicula-titulo {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            min-height: 40px;
+        }
+
+        .pelicula-datos {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .pelicula-clasificacion {
+            display: inline-block;
+            background-color: #2c3e50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .volver-btn {
+            margin-bottom: 20px;
+        }
+
+        .filtros {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-sm">
+        <div class="card">
+            <!-- Header -->
+            <div class="card-header">
+                <h2>Películas en Cartelera</h2>
+                <p id="nombreCine" style="color: #7f8c8d; margin: 5px 0 0 0;"></p>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertError" class="alert alert-error"></div>
+            <div id="alertSuccess" class="alert alert-success"></div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Cargando películas...</p>
+            </div>
+
+            <!-- Contenido -->
+            <div class="card-body">
+                <!-- Botón volver -->
+                <div class="volver-btn">
+                    <button onclick="volverACines()" class="btn btn-secondary">← Cambiar Cine</button>
+                </div>
+
+                <!-- Grid de películas -->
+                <div id="peliculasGrid" class="peliculas-grid">
+                    <!-- Las películas se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            protegerRuta(); // Solo usuarios autenticados
+            
+            const cineId = obtenerDeLocal('cineSeleccionado');
+            const nombreCine = obtenerDeLocal('nombreCine');
+
+            if (!cineId) {
+                mostrarError('No has seleccionado un cine. Intenta de nuevo.');
+                setTimeout(() => redirigir('cines.html'), 2000);
+                return;
+            }
+
+            // Mostrar nombre del cine
+            document.getElementById('nombreCine').textContent = `Cine: ${nombreCine}`;
+
+            controlarLoading('loading', true);
+
+            try {
+                // Cargar todas las películas
+                const respuestaPeliculas = await apiGet('admin/peliculas');
+                const peliculas = respuestaPeliculas || [];
+
+                if (peliculas.length === 0) {
+                    document.getElementById('peliculasGrid').innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <p style="color: #999; font-size: 16px;">
+                                No hay películas disponibles en estos momentos.
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Mostrar películas
+                mostrarPeliculas(peliculas, cineId, nombreCine);
+
+            } catch (error) {
+                console.error('Error al cargar películas:', error);
+                mostrarError('No se pudieron cargar las películas. Intenta más tarde.');
+            } finally {
+                controlarLoading('loading', false);
+            }
+        });
+
+        function mostrarPeliculas(peliculas, cineId, nombreCine) {
+            const grid = document.getElementById('peliculasGrid');
+            
+            if (peliculas.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <p style="color: #999; font-size: 16px;">
+                            No hay películas disponibles en este cine.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = peliculas.map(pelicula => `
+                <div class="pelicula-card" onclick="seleccionarPelicula(${pelicula.id}, '${pelicula.nombreComercial}', ${cineId}, '${nombreCine}')">
+                    <div class="pelicula-imagen">
+                        ${pelicula.imagen ? 
+                            `<img src="${pelicula.imagen}" alt="${pelicula.nombreComercial}">` :
+                            'Sin imagen'
+                        }
+                    </div>
+                    <div class="pelicula-info">
+                        <div class="pelicula-titulo">${pelicula.nombreComercial}</div>
+                        <div class="pelicula-datos">
+                            <strong>Duración:</strong> ${pelicula.duracion} min
+                        </div>
+                        <div class="pelicula-datos">
+                            <strong>Director:</strong> ${pelicula.director || 'No especificado'}
+                        </div>
+                        <div class="pelicula-datos">
+                            <strong>Protagonistas:</strong> ${pelicula.protagonistas || 'No especificado'}
+                        </div>
+                        ${pelicula.clasificacion ? 
+                            `<span class="pelicula-clasificacion">${pelicula.clasificacion}</span>` :
+                            ''
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function seleccionarPelicula(peliculaId, nombrePelicula, cineId, nombreCine) {
+            // Guardar película seleccionada
+            guardarEnLocal('peliculaSeleccionada', peliculaId);
+            guardarEnLocal('nombrePelicula', nombrePelicula);
+            // Mantener datos del cine
+            guardarEnLocal('cineSeleccionado', cineId);
+            guardarEnLocal('nombreCine', nombreCine);
+            
+            // Redirigir a proyecciones
+            redirigir('proyecciones.html');
+        }
+
+        function volverACines() {
+            limpiarLocal('peliculaSeleccionada');
+            limpiarLocal('nombrePelicula');
+            redirigir('cines.html');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.CinesPage"
+             Title="Cines">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Label Text="Selecciona tu Cine"
+               FontSize="24"
+               HorizontalOptions="Center"/>
+
+        <Label Text="Elige la sucursal donde deseas ver tu película"
+               FontSize="14"
+               HorizontalOptions="Center"/>
+
+        <!-- Picker (equivalente al select) -->
+        <Picker x:Name="CinePicker"
+                Title="Selecciona un cine" />
+
+        <!-- Botón -->
+        <Button Text="Continuar"
+                Clicked="OnContinuarClicked"/>
+
+        <!-- Loading -->
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsVisible="False"
+                           IsRunning="False"/>
+
+        <!-- Error -->
+        <Label x:Name="ErrorLabel"
+               TextColor="Red"
+               IsVisible="False"/>
+
+    </VerticalStackLayout>
+</ContentPage>

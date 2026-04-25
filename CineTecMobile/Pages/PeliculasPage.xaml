@@ -1,0 +1,51 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.PeliculasPage">
+
+    <VerticalStackLayout Padding="10">
+
+        <!-- Título -->
+        <Label Text="Películas en cartelera"
+               FontSize="24"
+               HorizontalOptions="Center"/>
+
+        <Label x:Name="NombreCineLabel"
+               FontSize="14"
+               HorizontalOptions="Center"/>
+
+        <!-- Lista -->
+        <CollectionView x:Name="PeliculasList">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" Padding="10">
+
+                        <VerticalStackLayout>
+
+                            <Label Text="{Binding NombreComercial}"
+                               TextColor="White"
+                               FontSize="18"
+                               FontAttributes="Bold"/>
+
+                            <Label Text="{Binding Duracion, StringFormat='Duración: {0} min'}"
+                                TextColor="White"/>
+
+                            <Label Text="{Binding Director}"
+                                TextColor="White"/>  
+
+                            <Button Text="Seleccionar"
+                                    Clicked="OnSeleccionarClicked"/>
+
+                        </VerticalStackLayout>
+
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <ActivityIndicator x:Name="LoadingIndicator"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,33 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.LoginPage">
+
+    <VerticalStackLayout Padding="30" Spacing="20">
+
+        <Label Text="CineTec"
+               FontSize="32"
+               HorizontalOptions="Center"/>
+
+        <Label Text="Ingresa tu cédula"
+               HorizontalOptions="Center"/>
+
+        <Entry x:Name="CedulaEntry"
+               Placeholder="Ej: 123456789"
+               Keyboard="Numeric"/>
+
+        <Button Text="Ingresar"
+                Clicked="OnLoginClicked"/>
+        
+        <Label Text="¿Eres nuevo en CineTEC?"
+           FontSize="14"
+           HorizontalOptions="Center"
+           TextColor="Gray"/>
+
+        <Button Text="Crear nueva cuenta"
+            BackgroundColor="Transparent"
+            TextColor="LightBlue"
+            Clicked="OnCrearCuentaClicked"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

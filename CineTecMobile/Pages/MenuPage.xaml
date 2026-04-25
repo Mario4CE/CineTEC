@@ -1,0 +1,32 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.MenuPage">
+
+    <VerticalStackLayout Padding="30" Spacing="20">
+
+        <Label Text="Bienvenido a CineTec"
+               FontSize="24"
+               HorizontalOptions="Center"/>
+
+        <Label x:Name="BienvenidaUsuario"
+               Text="¡Disfruta tu experiencia!"
+               FontSize="16"
+               HorizontalOptions="Center"/>
+
+        <Button Text="Comprar boletos"
+                Clicked="OnCinesClicked" />
+
+        <Button Text="Ver mis boletos"
+                Clicked="OnMisBoletosClicked" />
+
+        <Button Text="Mi perfil"
+                Clicked="OnPerfilClicked" />
+
+        <Button Text="Cerrar sesión"
+                BackgroundColor="Red"
+                TextColor="White"
+                Clicked="OnLogoutClicked"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

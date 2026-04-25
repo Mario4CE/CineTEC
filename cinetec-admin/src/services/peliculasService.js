@@ -46,3 +46,17 @@ export const eliminarPeliculaService = async (id) => {
     const res = await API.delete(`/admin/peliculas/${id}`);
     return res.data;
 };
+
+// Subir imagen y obtener la ruta pública
+export const subirImagenPelicula = async (archivo) => {
+    const formData = new FormData();
+    formData.append("archivo", archivo);
+
+    const res = await API.post("/admin/peliculas/upload-imagen", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
+
+    return res.data;
+};

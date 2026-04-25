@@ -28,7 +28,8 @@ import {
     obtenerPeliculas,
     crearPelicula,
     actualizarPelicula,
-    eliminarPeliculaService
+    eliminarPeliculaService,
+    subirImagenPelicula
 } from "../services/peliculasService";
 
 function Peliculas() {
@@ -37,6 +38,7 @@ function Peliculas() {
     const [peliculas, setPeliculas] = useState([]); // Lista de películas
     const [cargando, setCargando] = useState(true); // Estado de carga
     const [error, setError] = useState(""); // Mensajes de error
+    const [subiendoImagen, setSubiendoImagen] = useState(false); // Estado de subida de imagen
 
     // Estados para edición
     const [modoEdicion, setModoEdicion] = useState(false);
@@ -82,6 +84,26 @@ function Peliculas() {
         });
     };
 
+    const manejarSeleccionImagen = async (e) => {
+        const archivo = e.target.files?.[0];
+        if (!archivo) return;
+
+        try {
+            setSubiendoImagen(true);
+            const respuesta = await subirImagenPelicula(archivo);
+            setForm((prev) => ({
+                ...prev,
+                imagen: respuesta.ruta
+            }));
+        } catch (err) {
+            console.error(err);
+            alert("No se pudo subir la imagen");
+        } finally {
+            setSubiendoImagen(false);
+            e.target.value = "";
+        }
+    };
+
     // Limpia el formulario y reinicia edición
     const limpiarFormulario = () => {
         setForm({
@@ -100,8 +122,8 @@ function Peliculas() {
     // Maneja envío del formulario (crear o actualizar)
     const manejarSubmit = async (e) => {
         e.preventDefault();
+        setError("");
 
-        // Convertir duración a número
         const payload = {
             ...form,
             duracion: Number(form.duracion)
@@ -109,11 +131,9 @@ function Peliculas() {
 
         try {
             if (modoEdicion) {
-                // Actualiza película existente
                 await actualizarPelicula(idEditar, payload);
                 alert("Película actualizada correctamente");
             } else {
-                // Crea nueva película
                 await crearPelicula(payload);
                 alert("Película agregada correctamente");
             }
@@ -121,8 +141,18 @@ function Peliculas() {
             limpiarFormulario();
             cargarPeliculas();
         } catch (err) {
-            console.error(err);
-            alert("Ocurrió un error al guardar la película");
+            console.error("Error completo:", err);
+
+            const mensaje =
+                err?.response?.data?.message ||
+                err?.response?.data?.titulo ||
+                err?.response?.data?.error ||
+                err?.response?.data ||
+                err?.message ||
+                "Ocurrió un error al guardar la película";
+
+            setError(`No se pudo guardar la película: ${mensaje}`);
+            alert(`No se pudo guardar la película: ${mensaje}`);
         }
     };
 
@@ -183,8 +213,19 @@ function Peliculas() {
                         </div>
 
                         <div className="col-md-6 mb-3">
-                            <label className="form-label">Imagen</label>
-                            <input type="text" className="form-control" name="imagen" value={form.imagen} onChange={manejarCambio} />
+                            <label className="form-label">Imagen (ruta guardada)</label>
+                            <input type="text" className="form-control" name="imagen" value={form.imagen} onChange={manejarCambio} placeholder="/images/peliculas/archivo.jpg" />
+                            <small className="text-muted">
+                                Puedes escribir una ruta manual o subir un archivo.
+                            </small>
+                        </div>
+
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label">Subir imagen</label>
+                            <input type="file" className="form-control" accept=".jpg,.jpeg,.png,.webp" onChange={manejarSeleccionImagen} disabled={subiendoImagen} />
+                            <small className="text-muted">
+                                {subiendoImagen ? "Subiendo imagen..." : "Formatos permitidos: JPG, PNG, WEBP."}
+                            </small>
                         </div>
 
                         <div className="col-md-6 mb-3">
@@ -210,7 +251,7 @@ function Peliculas() {
 
                     {/* Botones */}
                     <div className="d-flex gap-2">
-                        <button type="submit" className="btn btn-dark">
+                        <button type="submit" className="btn btn-dark" disabled={subiendoImagen}>
                             {modoEdicion ? "Actualizar" : "Guardar"}
                         </button>
 
@@ -238,6 +279,7 @@ function Peliculas() {
                                     <th>ID</th>
                                     <th>Nombre comercial</th>
                                     <th>Nombre original</th>
+                                    <th>Imagen</th>
                                     <th>Duración</th>
                                     <th>Director</th>
                                     <th>Clasificación</th>
@@ -252,6 +294,7 @@ function Peliculas() {
                                             <td>{p.id}</td>
                                             <td>{p.nombreComercial}</td>
                                             <td>{p.nombreOriginal}</td>
+                                            <td>{p.imagen ? <code>{p.imagen}</code> : "-"}</td>
                                             <td>{p.duracion} min</td>
                                             <td>{p.director}</td>
                                             <td>{p.clasificacion}</td>
@@ -269,7 +312,7 @@ function Peliculas() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center">
+                                        <td colSpan="8" className="text-center">
                                             No hay películas registradas.
                                         </td>
                                     </tr>

@@ -1,18 +1,34 @@
 # CineTEC
 
-## Ejecutar frontend + backend al mismo tiempo
+Proyecto CineTEC con:
 
-Si quieres levantar ambos servicios con un solo comando, usa:
+- **Backend** en **ASP.NET Core Web API**
+- **Panel Admin** en **React + Vite**
+- **Cliente** en archivos HTML estáticos
+
+Este documento explica cómo instalar y ejecutar el proyecto paso a paso en una computadora nueva.
+
+---
+
+# 1. Requisitos
+
+Antes de empezar, instala lo siguiente:
+
+## Backend
+- **.NET SDK 10**
+- **SQL Server LocalDB**  
+  También puede funcionar con:
+  - SQL Server Express
+  - SQL Server Developer
+
+## Frontend Admin
+- **Node.js**
+- **npm**
+
+## Cliente estático
+- **live-server**
+
+Instalar `live-server` globalmente:
 
 ```bash
-./scripts/dev-all.sh
-```
-
-Este script:
-- inicia `dotnet run` dentro de `CineTEC.API`
-- inicia `npm run dev -- --host 0.0.0.0 --port 5173` dentro de `cinetec-admin`
-- al presionar `Ctrl+C`, detiene ambos procesos
-
-Requisitos:
-- SDK de .NET instalado (para backend)
-- Node.js + npm instalados (para frontend)
+npm install -g live-server
