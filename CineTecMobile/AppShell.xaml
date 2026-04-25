@@ -5,7 +5,7 @@
     x:Class="CineTecMobile.AppShell">
 
     <ShellContent
-        Title="Registro"
-        ContentTemplate="{DataTemplate pages:RegistroPage}" />
+        Title="Login"
+        ContentTemplate="{DataTemplate pages:LoginPage}" />
 
 </Shell>

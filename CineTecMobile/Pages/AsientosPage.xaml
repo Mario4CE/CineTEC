@@ -1,0 +1,36 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.AsientosPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="10">
+
+            <!-- Info -->
+            <Label x:Name="InfoLabel"
+                   HorizontalOptions="Center"/>
+
+            <!-- Pantalla -->
+            <Label Text="PANTALLA"
+                   HorizontalOptions="Center"
+                   FontAttributes="Bold"/>
+
+            <!-- Grid -->
+            <Grid x:Name="AsientosGrid"
+                  RowSpacing="5"
+                  ColumnSpacing="5"
+                  HorizontalOptions="Center"/>
+
+            <!-- Resumen -->
+            <Label x:Name="ResumenLabel"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
+
+            <!-- Botón -->
+            <Button Text="Comprar"
+                    x:Name="BtnComprar"
+                    Clicked="OnComprarClicked"
+                    IsEnabled="False"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

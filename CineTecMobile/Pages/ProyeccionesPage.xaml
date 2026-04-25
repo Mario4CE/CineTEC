@@ -1,20 +1,19 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CineTecMobile.Pages.PeliculasPage">
+             x:Class="CineTecMobile.Pages.ProyeccionesPage">
 
-    <VerticalStackLayout Padding="10">
+    <VerticalStackLayout Padding="10" Spacing="10">
 
         <!-- Título -->
-        <Label Text="Películas en cartelera"
+        <Label Text="Selecciona una Proyección"
                FontSize="24"
                HorizontalOptions="Center"/>
 
-        <Label x:Name="NombreCineLabel"
-               FontSize="14"
+        <Label x:Name="InfoLabel"
                HorizontalOptions="Center"/>
 
         <!-- Lista -->
-        <CollectionView x:Name="PeliculasList">
+        <CollectionView x:Name="ProyeccionesList">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -22,16 +21,14 @@
 
                         <VerticalStackLayout>
 
-                            <Label Text="{Binding NombreComercial}"
-                               TextColor="White"
-                               FontSize="18"
-                               FontAttributes="Bold"/>
+                            <Label Text="{Binding FechaFormateada}"
+                                   FontSize="14"/>
 
-                            <Label Text="{Binding Duracion, StringFormat='Duración: {0} min'}"
-                                TextColor="White"/>
+                            <Label Text="{Binding HoraFormateada}"
+                                   FontSize="24"
+                                   FontAttributes="Bold"/>
 
-                            <Label Text="{Binding Director}"
-                                TextColor="White"/>  
+                            <Label Text="{Binding SalaInfo}"/>
 
                             <Button Text="Seleccionar"
                                     Clicked="OnSeleccionarClicked"/>
@@ -40,12 +37,10 @@
 
                     </Frame>
                 </DataTemplate>
+
             </CollectionView.ItemTemplate>
 
         </CollectionView>
 
-        <ActivityIndicator x:Name="LoadingIndicator"/>
-
     </VerticalStackLayout>
-
 </ContentPage>
