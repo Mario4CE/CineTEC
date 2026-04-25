@@ -31,7 +31,7 @@ public partial class ProyeccionesPage : ContentPage
         {
             using var client = new HttpClient();
 
-            var response = await client.GetAsync("http://localhost:5000/api/admin/Proyecciones");
+            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Proyecciones");
 
             var json = await response.Content.ReadAsStringAsync();
 

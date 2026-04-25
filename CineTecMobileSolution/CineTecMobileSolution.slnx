@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="../CineTecMobile/CineTecMobile.csproj" />
+  <Project Path="../CineTecMobile/CineTecMobile.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
 </Solution>

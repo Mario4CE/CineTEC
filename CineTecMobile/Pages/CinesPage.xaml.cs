@@ -38,7 +38,7 @@ public partial class CinesPage : ContentPage
             using var client = new HttpClient();
 
             // Endpoint real
-            var response = await client.GetAsync("http://localhost:5000/api/admin/Sucursales");
+            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Sucursales");
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Error al obtener cines");
