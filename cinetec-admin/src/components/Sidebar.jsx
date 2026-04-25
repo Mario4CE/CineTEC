@@ -67,6 +67,21 @@ function Sidebar() {
                         Proyecciones
                     </Link>
                 </li>
+                
+                {/* Clientes */}
+                <li className="nav-item mb-2">
+                    <Link to="/admin/clientes" className="nav-link text-white">
+                        Clientes
+                    </Link>
+                </li>
+
+                {/* Restricciones de Asientos */}
+                <li className="nav-item mb-2">
+                    <Link to="/admin/restricciones-asientos" className="nav-link text-white">
+                        Restricciones de Asientos
+                    </Link>
+                </li>
+
             </ul>
         </div>
     )

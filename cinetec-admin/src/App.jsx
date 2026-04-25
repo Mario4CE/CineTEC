@@ -29,6 +29,8 @@ import Peliculas from './pages/Peliculas'
 import Sucursales from './pages/Sucursales'
 import Salas from './pages/Salas'
 import Proyecciones from './pages/Proyecciones'
+import Clientes from './pages/Clientes'
+import RestriccionesAsientos from './pages/RestriccionesAsientos'
 
 // Componente de estructura base (layout del admin)
 import Layout from './components/Layout'
@@ -61,6 +63,12 @@ function App() {
 
                     {/* Subruta para gestión de proyecciones */}
                     <Route path="proyecciones" element={<Proyecciones />} />
+
+                    {/* Subruta para gestión de clientes */}
+                    <Route path="clientes" element={<Clientes />} />
+
+                    {/* Subruta para gestión de restricciones de asientos */}
+                    <Route path="restricciones-asientos" element={<RestriccionesAsientos />}/>
 
                 </Route>
             </Routes>
