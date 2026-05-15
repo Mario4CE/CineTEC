@@ -1,0 +1,177 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.PerfilPage"
+             Title="Mi Perfil">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Encabezado -->
+            <Label Text="Mi Perfil"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#2c3e50"/>
+
+            <!-- Avatar/Imagen -->
+            <Frame BorderColor="#3498db" Padding="10" CornerRadius="50" 
+                   HasShadow="True" HorizontalOptions="Center">
+                <Label Text="👤"
+                       FontSize="60"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <!-- Información Personal -->
+            <Frame BorderColor="#ecf0f1" Padding="15" CornerRadius="10">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Información Personal"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#2c3e50"/>
+
+                    <!-- Nombre Completo -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Nombre Completo:"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="Black"/>
+                        <Label x:Name="NombreLabel"
+                               FontSize="14"
+                               TextColor="Black"/>
+                    </VerticalStackLayout>
+
+                    <!-- Cédula -->
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Cédula:"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="Black"/>
+                        <Label x:Name="CedulaLabel"
+                               FontSize="14"
+                               TextColor="Black"/>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Estadísticas -->
+            <Frame BorderColor="#ecf0f1" Padding="15" CornerRadius="10">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Mi Actividad"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#2c3e50"/>
+
+                    <!-- Total de Boletos -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Total de Boletos:"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#7f8c8d"/>
+                            <Label x:Name="TotalBoletosLabel"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#3498db"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Grid.Column="1">
+                            <Label Text="Monto Total Gastado:"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#7f8c8d"/>
+                            <Label x:Name="MontoTotalLabel"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#27ae60"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Grid.Row="1">
+                            <Label Text="Películas Vistas:"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#7f8c8d"/>
+                            <Label x:Name="PeliculasVistasLabel"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#e74c3c"/>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="5" Grid.Row="1" Grid.Column="1">
+                            <Label Text="Cines Visitados:"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#7f8c8d"/>
+                            <Label x:Name="CinesVisitadosLabel"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#f39c12"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Preferencias -->
+            <Frame BorderColor="#ecf0f1" Padding="15" CornerRadius="10">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Preferencias"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#2c3e50"/>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Notificaciones activadas"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   TextColor="Black"/>
+                            <Switch x:Name="NotificacionesSwitch"
+                                    IsToggled="True"
+                                    Grid.Column="1"/>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Recordarme datos"
+                                   FontSize="14"
+                                   VerticalOptions="Center"
+                                   TextColor="Black"/>
+                            <Switch x:Name="RecordarSwitch"
+                                    IsToggled="True"
+                                    Grid.Column="1"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botones de Acción -->
+            <VerticalStackLayout Spacing="10" Margin="0,20,0,0">
+                <Button Text="Editar Perfil"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        Clicked="OnEditarPerfilClicked"
+                        FontAttributes="Bold"/>
+
+                <Button Text="Cambiar Contraseña"
+                        BackgroundColor="#3498db"
+                        TextColor="White"
+                        Clicked="OnCambiarContrasenaClicked"
+                        FontAttributes="Bold"/>
+
+                <Button Text="Eliminar Cuenta"
+                        BackgroundColor="#e74c3c"
+                        TextColor="White"
+                        Clicked="OnEliminarCuentaClicked"
+                        FontAttributes="Bold"/>
+
+                <Button Text="Volver al Menú"
+                        BackgroundColor="#95a5a6"
+                        TextColor="White"
+                        Clicked="OnVolverClicked"
+                        FontAttributes="Bold"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -1,23 +1,50 @@
-﻿using System.Text.Json;
-using CineTecMobile.Models;
+﻿using CineTecMobile.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CineTecMobile.Services;
 
+/// <summary>
+/// Servicio para operaciones relacionadas con cines
+/// </summary>
 public class CineService
 {
-    private readonly HttpClient _httpClient;
+    private readonly ApiService _apiService;
+    private readonly ILogger<CineService> _logger;
 
-    public CineService()
+    public CineService(ApiService apiService, ILogger<CineService> logger)
     {
-        _httpClient = new HttpClient();
+        _apiService = apiService;
+        _logger = logger;
     }
 
+    /// <summary>
+    /// Obtiene la lista de cines/sucursales
+    /// </summary>
     public async Task<List<Cine>> GetCines()
     {
-        string url = "http://192.168.100.21:5000/api/Sucursales";
+        _logger.LogInformation("Obteniendo lista de cines desde el API");
 
-        var response = await _httpClient.GetStringAsync(url);
-
-        return JsonSerializer.Deserialize<List<Cine>>(response);
+        try
+        {
+            // Endpoint: /api/admin/Sucursales
+            var cines = await _apiService.GetAsync<List<Cine>>("/admin/Sucursales");
+            _logger.LogInformation($"Se obtuvieron {cines?.Count ?? 0} cines correctamente");
+            return cines ?? new List<Cine>();
+        }
+        catch (HttpRequestException hre)
+        {
+            _logger.LogError($"Error de conexión HTTP al obtener cines: {hre.Message}");
+            throw;
+        }
+        catch (InvalidOperationException ioe)
+        {
+            _logger.LogError($"Error de configuración al obtener cines: {ioe.Message}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error inesperado al obtener cines: {ex.Message}\n{ex.StackTrace}");
+            throw;
+        }
     }
 }

@@ -1,3 +1,6 @@
+using CineTecMobile.Models;
+using CineTecMobile.Services;
+
 namespace CineTecMobile.Pages;
 
 public partial class AsientosPage : ContentPage
@@ -8,10 +11,13 @@ public partial class AsientosPage : ContentPage
 
     int filas = 10;
     int columnas = 12;
+    
+    private readonly ReservaService _reservaService;
 
     public AsientosPage()
     {
         InitializeComponent();
+        _reservaService = new ReservaService();
     }
 
     protected override void OnAppearing()
@@ -133,6 +139,74 @@ public partial class AsientosPage : ContentPage
             return;
         }
 
-        await DisplayAlert("Compra", "Compra realizada 🎉", "OK");
+        try
+        {
+            BtnComprar.IsEnabled = false;
+            BtnComprar.Text = "Procesando...";
+
+            // Obtener datos guardados en Preferences
+            string cedulaUsuario = Preferences.Get("usuarioCedula", "");
+            int cineId = Preferences.Get("cineId", 0);
+            string nombreCine = Preferences.Get("cineNombre", "");
+            int peliculaId = Preferences.Get("peliculaId", 0);
+            string nombrePelicula = Preferences.Get("peliculaNombre", "");
+            int proyeccionId = Preferences.Get("proyeccionId", 0);
+            string horaProyeccion = Preferences.Get("horaProyeccion", "");
+
+            // Convertir asientos de "fila-col" a formato legible (A1, A2, etc)
+            var asientosFormateados = seleccionados
+                .Select(asiento =>
+                {
+                    var partes = asiento.Split('-');
+                    if (partes.Length == 2 && 
+                        int.TryParse(partes[0], out int fila) && 
+                        int.TryParse(partes[1], out int col))
+                    {
+                        string letraFila = ((char)('A' + fila)).ToString();
+                        return $"{letraFila}{col + 1}";
+                    }
+                    return asiento;
+                })
+                .ToList();
+
+            decimal totalPago = seleccionados.Count * PRECIO;
+
+            // Crear la reserva
+            var reserva = new Reserva
+            {
+                CedulaUsuario = cedulaUsuario,
+                CineId = cineId,
+                NombreCine = nombreCine,
+                PeliculaId = peliculaId,
+                NombrePelicula = nombrePelicula,
+                ProyeccionId = proyeccionId,
+                HoraProyeccion = horaProyeccion,
+                Asientos = asientosFormateados,
+                CantidadAsientos = seleccionados.Count,
+                PrecioUnitario = PRECIO,
+                TotalPago = totalPago,
+                Estado = "Pendiente"
+            };
+
+            // Guardar reserva
+            var reservaGuardada = _reservaService.GuardarReserva(reserva);
+
+            // Guardar el número de factura en Preferences para pasarlo a la siguiente página
+            Preferences.Set("numeroFactura", reservaGuardada.NumeroFactura);
+            Preferences.Set("totalPago", (int)totalPago);
+            Preferences.Set("asientosSeleccionados", string.Join(",", asientosFormateados));
+
+            // Navegar a la página de resumen
+            await Shell.Current.GoToAsync("ResumenPage");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Error al procesar la compra: {ex.Message}", "OK");
+        }
+        finally
+        {
+            BtnComprar.IsEnabled = true;
+            BtnComprar.Text = "Comprar";
+        }
     }
 }

@@ -1,14 +1,18 @@
 using System.Text.Json;
+using CineTecMobile.Services;
+using CineTecMobile.Models;
 
 namespace CineTecMobile.Pages;
 
 public partial class ProyeccionesPage : ContentPage
 {
     private List<Proyeccion> lista = new();
+    private readonly ApiService _apiService;
 
-    public ProyeccionesPage()
+    public ProyeccionesPage(ApiService apiService)
     {
         InitializeComponent();
+        _apiService = apiService;
     }
 
     protected override async void OnAppearing()
@@ -29,18 +33,16 @@ public partial class ProyeccionesPage : ContentPage
     {
         try
         {
-            using var client = new HttpClient();
+            // Obtener proyecciones del endpoint correcto
+            var todas = await _apiService.GetAsync<List<Proyeccion>>("/admin/proyecciones");
 
-            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Proyecciones");
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            var todas = JsonSerializer.Deserialize<List<Proyeccion>>(json, new JsonSerializerOptions
+            if (todas == null)
             {
-                PropertyNameCaseInsensitive = true
-            });
+                await DisplayAlert("Error", "No se pudieron cargar las proyecciones", "OK");
+                return;
+            }
 
-            // Se filtran
+            // Se filtran por película y cine
             var filtradas = todas
                 .Where(p =>
                     p.PeliculaId == peliculaId &&
@@ -58,11 +60,16 @@ public partial class ProyeccionesPage : ContentPage
             }
 
             ProyeccionesList.ItemsSource = filtradas;
+
+            if (!filtradas.Any())
+            {
+                await DisplayAlert("Info", "No hay proyecciones disponibles para esta película en este cine", "OK");
+            }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", "No se pudieron cargar las proyecciones", "OK");
-            Console.WriteLine(ex.Message);
+            await DisplayAlert("Error", $"No se pudieron cargar las proyecciones: {ex.Message}", "OK");
+            Console.WriteLine($"Error detallado: {ex}");
         }
     }
 

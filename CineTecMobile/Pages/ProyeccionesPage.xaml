@@ -22,11 +22,13 @@
                         <VerticalStackLayout>
 
                             <Label Text="{Binding FechaFormateada}"
-                                   FontSize="14"/>
+                                   FontSize="14"
+                                   TextColor="Black"/>
 
                             <Label Text="{Binding HoraFormateada}"
                                    FontSize="24"
-                                   FontAttributes="Bold"/>
+                                   FontAttributes="Bold"
+                                   TextColor="Black"/>
 
                             <Label Text="{Binding SalaInfo}"/>
 

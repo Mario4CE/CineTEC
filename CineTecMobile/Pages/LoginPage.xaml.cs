@@ -1,12 +1,19 @@
-using System.Text.Json;
+using CineTecMobile.Services;
+using CineTecMobile.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CineTecMobile.Pages;
 
 public partial class LoginPage : ContentPage
 {
-    public LoginPage()
+    private readonly UsuarioService _usuarioService;
+    private readonly ILogger<LoginPage> _logger;
+
+    public LoginPage(UsuarioService usuarioService, ILogger<LoginPage> logger)
     {
         InitializeComponent();
+        _usuarioService = usuarioService;
+        _logger = logger;
     }
 
     private async void OnLoginClicked(object sender, EventArgs e)
@@ -21,40 +28,58 @@ public partial class LoginPage : ContentPage
 
         try
         {
-            using var client = new HttpClient();
+            _logger.LogInformation($"Intentando login con cédula: {cedula}");
+            
+            // Mostrar indicador de carga
+            LoginButton.IsEnabled = false;
+            LoginButton.Text = "Conectando...";
 
-            // endpoint
-            var response = await client.GetAsync($"http://192.168.0.14:5000/api/usuarios/cedula/{cedula}");
+            // Obtener usuario del API
+            var usuario = await _usuarioService.ObtenerPorCedula(cedula);
 
-            if (!response.IsSuccessStatusCode)
+            if (usuario == null)
             {
                 await DisplayAlert("Error", "Usuario no encontrado", "OK");
+                LoginButton.IsEnabled = true;
+                LoginButton.Text = "Iniciar Sesión";
                 return;
             }
 
-            var json = await response.Content.ReadAsStringAsync();
-
-            var usuario = JsonSerializer.Deserialize<Usuario>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-
-            // guardar sesión
+            // Guardar sesión
             Preferences.Set("usuarioNombre", usuario.NombreCompleto);
             Preferences.Set("usuarioCedula", usuario.Cedula);
+
+            _logger.LogInformation($"Login exitoso: {usuario.NombreCompleto}");
 
             await DisplayAlert("Bienvenido", usuario.NombreCompleto, "OK");
 
             await Shell.Current.GoToAsync("MenuPage");
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError($"Error de conexión: {ex.Message}");
+            await DisplayAlert("Error de Conexión", 
+                "No se pudo conectar al servidor. Verifica:\n" +
+                "• El API está corriendo\n" +
+                "• La IP es correcta (172.18.92.169)\n" +
+                "• El puerto es 5000\n" +
+                "• La red está disponible\n\n" +
+                $"Detalles: {ex.Message}", "OK");
+        }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", "No se pudo conectar", "OK");
-            Console.WriteLine(ex.Message);
+            _logger.LogError($"Error inesperado: {ex.Message}");
+            await DisplayAlert("Error", $"Ocurrió un error: {ex.Message}", "OK");
+        }
+        finally
+        {
+            LoginButton.IsEnabled = true;
+            LoginButton.Text = "Iniciar Sesión";
         }
     }
+
     private async void OnCrearCuentaClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Info", "Función no disponible aún 😅", "OK");
+        await Shell.Current.GoToAsync("RegistroPage");
     }
 }

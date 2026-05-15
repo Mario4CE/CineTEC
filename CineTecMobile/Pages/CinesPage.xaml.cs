@@ -1,16 +1,20 @@
 using CineTecMobile.Models;
-using System.Text.Json;
+using CineTecMobile.Services;
 
 namespace CineTecMobile.Pages;
 
 public partial class CinesPage : ContentPage
 {
+    // Servicios inyectados
+    private readonly CineService _cineService;
+
     // Lista de cines cargados desde la API
     private List<Cine> listaCines = new();
 
-    public CinesPage()
+    public CinesPage(CineService cineService)
     {
         InitializeComponent();
+        _cineService = cineService;
     }
 
     /// <summary>
@@ -35,21 +39,15 @@ public partial class CinesPage : ContentPage
 
             ErrorLabel.IsVisible = false;
 
-            using var client = new HttpClient();
+            // Usar CineService inyectado
+            listaCines = await _cineService.GetCines();
 
-            // Endpoint real
-            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Sucursales");
-
-            if (!response.IsSuccessStatusCode)
-                throw new Exception("Error al obtener cines");
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            // Convertir JSON a objetos
-            listaCines = JsonSerializer.Deserialize<List<Cine>>(json, new JsonSerializerOptions
+            if (listaCines == null || listaCines.Count == 0)
             {
-                PropertyNameCaseInsensitive = true
-            });
+                ErrorLabel.Text = "No hay cines disponibles en este momento";
+                ErrorLabel.IsVisible = true;
+                return;
+            }
 
             // Llenar el Picker
             CinePicker.ItemsSource = listaCines;
@@ -57,10 +55,10 @@ public partial class CinesPage : ContentPage
         }
         catch (Exception ex)
         {
-            ErrorLabel.Text = "No se pudieron cargar los cines";
+            ErrorLabel.Text = $"Error al cargar cines: {ex.Message}";
             ErrorLabel.IsVisible = true;
 
-            Console.WriteLine(ex.Message);
+            System.Diagnostics.Debug.WriteLine($"[CinesPage] Error: {ex}");
         }
         finally
         {

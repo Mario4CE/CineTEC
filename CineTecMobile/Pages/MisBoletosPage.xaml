@@ -1,0 +1,134 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CineTecMobile.Pages.MisBoletosPage"
+             Title="Mis Boletos">
+
+    <VerticalStackLayout Padding="15" Spacing="10">
+
+        <!-- Encabezado -->
+        <Label Text="Mis Boletos"
+               FontSize="24"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"
+               TextColor="#2c3e50"/>
+
+        <!-- Indicador de carga -->
+        <ActivityIndicator x:Name="LoadingIndicator"
+                           IsRunning="True"
+                           IsVisible="True"
+                           Color="#3498db"/>
+
+        <!-- Mensaje de sin boletos -->
+        <Label x:Name="MensajeVacioLabel"
+               Text="No tienes boletos"
+               FontSize="16"
+               HorizontalOptions="Center"
+               IsVisible="False"
+               TextColor="#7f8c8d"/>
+
+        <!-- Lista de boletos -->
+        <CollectionView x:Name="Boletos"
+                        SelectionMode="Single">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="0,5" Padding="15" CornerRadius="10" BorderColor="#ecf0f1" HasShadow="True">
+                        <VerticalStackLayout Spacing="10">
+
+                            <!-- Película y Cine -->
+                            <Label Text="{Binding NombrePelicula}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="#2c3e50"/>
+
+                            <Label Text="{Binding NombreCine}"
+                                   FontSize="12"
+                                   TextColor="#7f8c8d"/>
+
+                            <!-- Fecha y Hora -->
+                            <Grid ColumnDefinitions="*,*">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Fecha:"
+                                           FontSize="12"
+                                           FontAttributes="Bold"/>
+                                    <Label x:Name="FechaLabel"
+                                           FontSize="12"/>
+                                </VerticalStackLayout>
+
+                                <VerticalStackLayout Spacing="5" Grid.Column="1">
+                                    <Label Text="Hora:"
+                                           FontSize="12"
+                                           FontAttributes="Bold"/>
+                                    <Label Text="{Binding HoraProyeccion}"
+                                           FontSize="12"/>
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Asientos -->
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Asientos:"
+                                       FontSize="12"
+                                       FontAttributes="Bold"/>
+                                <Label Text="{Binding AsientosFormateados}"
+                                       FontSize="12"
+                                       TextColor="#3498db"/>
+                            </VerticalStackLayout>
+
+                            <!-- Número de Factura -->
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Factura:"
+                                       FontSize="12"
+                                       FontAttributes="Bold"/>
+                                <Label Text="{Binding NumeroFactura}"
+                                       FontSize="11"
+                                       TextColor="#7f8c8d"/>
+                            </VerticalStackLayout>
+
+                            <!-- Total -->
+                            <Label Text="{Binding TotalFormateado}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#27ae60"/>
+
+                            <!-- Estado -->
+                            <Frame Padding="0" CornerRadius="5" HasShadow="False" BorderColor="Transparent">
+                                <Label x:Name="EstadoLabel"
+                                       FontSize="12"
+                                       Padding="10"
+                                       TextColor="White"
+                                       HorizontalTextAlignment="Center"/>
+                            </Frame>
+
+                            <!-- Botones -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Text="Ver Detalles"
+                                        BackgroundColor="#3498db"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Clicked="OnVerDetallesClicked"/>
+
+                                <Button Text="Cancelar"
+                                        BackgroundColor="#e74c3c"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Grid.Column="1"
+                                        Clicked="OnCancelarClicked"/>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <!-- Botón Volver -->
+        <Button Text="Volver al Menú"
+                BackgroundColor="#95a5a6"
+                TextColor="White"
+                Clicked="OnVolverClicked"
+                Margin="0,20,0,0"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

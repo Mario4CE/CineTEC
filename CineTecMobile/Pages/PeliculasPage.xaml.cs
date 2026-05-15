@@ -1,15 +1,18 @@
-
 using System.Text.Json;
+using CineTecMobile.Services;
+using CineTecMobile.Models;
 
 namespace CineTecMobile.Pages;
 
 public partial class PeliculasPage : ContentPage
 {
     private List<Pelicula> listaPeliculas = new();
+    private readonly ApiService _apiService;
 
-    public PeliculasPage()
+    public PeliculasPage(ApiService apiService)
     {
         InitializeComponent();
+        _apiService = apiService;
     }
 
     protected override async void OnAppearing()
@@ -28,44 +31,23 @@ public partial class PeliculasPage : ContentPage
         {
             int cineId = Preferences.Get("cineId", 0);
 
-            using var client = new HttpClient();
+            // Obtener películas del endpoint correcto
+            var peliculas = await _apiService.GetAsync<List<Pelicula>>("/admin/peliculas");
 
-            // Usamos proyecciones
-            var response = await client.GetAsync("http://192.168.100.21:5000/api/admin/Proyecciones");
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions
+            if (peliculas == null || peliculas.Count == 0)
             {
-                PropertyNameCaseInsensitive = true
-            };
-
-            var proyecciones = JsonSerializer.Deserialize<List<Proyeccion>>(json, options);
-
-            // Filtrar por cine
-            var filtradas = proyecciones
-                .Where(p => p.Sala?.Sucursal?.Id == cineId)
-                .ToList();
-
-            // Sacar películas únicas
-            var peliculas = filtradas
-                .Select(p => p.Pelicula)
-                .GroupBy(p => p.Id)
-                .Select(g => g.First())
-                .ToList();
-
-            PeliculasList.ItemsSource = peliculas;
-
-            // UX extra
-            if (!peliculas.Any())
-            {
-                await DisplayAlert("Info", "No hay películas en este cine", "OK");
+                PeliculasList.ItemsSource = new List<Pelicula>();
+                await DisplayAlert("Info", "No hay películas disponibles", "OK");
+                return;
             }
+
+            listaPeliculas = peliculas;
+            PeliculasList.ItemsSource = peliculas;
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", "No se pudieron cargar las películas", "OK");
-            Console.WriteLine(ex.Message);
+            await DisplayAlert("Error", $"No se pudieron cargar las películas: {ex.Message}", "OK");
+            Console.WriteLine($"Error detallado: {ex}");
         }
     }
 
@@ -80,8 +62,5 @@ public partial class PeliculasPage : ContentPage
         Preferences.Set("peliculaNombre", pelicula.NombreComercial);
 
         await Shell.Current.GoToAsync("ProyeccionesPage");
-
-        // luego navegamos
-        // await Shell.Current.GoToAsync("ProyeccionesPage");
     }
 }

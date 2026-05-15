@@ -1,50 +1,130 @@
 using CineTecMobile.Services;
+using CineTecMobile.Models;
 
 namespace CineTecMobile.Pages;
 
 public partial class RegistroPage : ContentPage
 {
-    public RegistroPage()
+    private readonly UsuarioService _usuarioService;
+
+    public RegistroPage(UsuarioService usuarioService)
     {
         InitializeComponent();
+        _usuarioService = usuarioService;
 
-        // Restricción: mínimo 13 años
-        FechaNacimientoPicker.MaximumDate = DateTime.Today.AddYears(-13);
+        // Mostrar/ocultar campos de estudiante al cambiar el switch
+        EsEstudianteSwitch.Toggled += (s, e) =>
+        {
+            UniversidadLabel.IsVisible = e.Value;
+            UniversidadEntry.IsVisible = e.Value;
+            CarnetLabel.IsVisible = e.Value;
+            CarnetEntry.IsVisible = e.Value;
+        };
     }
 
     private async void OnRegisterClicked(object sender, EventArgs e)
     {
         MensajeLabel.IsVisible = false;
 
-        var datos = new
+        // Validar campos requeridos
+        if (string.IsNullOrWhiteSpace(NombreCompletoEntry.Text))
         {
-            nombre = NombreEntry.Text,
-            apellido = ApellidoEntry.Text,
-            cedula = CedulaEntry.Text,
-            telefono = TelefonoEntry.Text,
-            fechaNacimiento = FechaNacimientoPicker.Date
-        };
+            MostrarError("El nombre es requerido");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(CedulaEntry.Text))
+        {
+            MostrarError("La cédula es requerida");
+            return;
+        }
+
+        if (CedulaEntry.Text.Length < 9)
+        {
+            MostrarError("La cédula debe tener al menos 9 dígitos");
+            return;
+        }
 
         try
         {
-            
-            await Task.Delay(500); // simulación
+            var button = sender as Button;
+            button.IsEnabled = false;
+            button.Text = "Registrando...";
 
-            await DisplayAlert("Éxito", "Usuario registrado correctamente", "OK");
+            // Crear objeto de registro
+            var usuarioDto = new
+            {
+                nombreCompleto = NombreCompletoEntry.Text,
+                cedula = CedulaEntry.Text,
+                telefono = TelefonoEntry.Text ?? "",
+                email = EmailEntry.Text ?? "",
+                esEstudiante = EsEstudianteSwitch.IsToggled,
+                universidad = EsEstudianteSwitch.IsToggled ? UniversidadEntry.Text : "",
+                carnet = EsEstudianteSwitch.IsToggled ? CarnetEntry.Text : ""
+            };
 
-            // Ir al menú
-            await Shell.Current.GoToAsync("MenuPage");
+            // Registrar usuario
+            var usuarioRegistrado = await _usuarioService.Registrar(usuarioDto);
+
+            if (usuarioRegistrado != null)
+            {
+                await DisplayAlert("¡Éxito!", 
+                    $"¡Bienvenido {usuarioRegistrado.NombreCompleto}!\nYa puedes iniciar sesión", 
+                    "OK");
+
+                // Limpiar campos
+                LimpiarCampos();
+
+                // Volver al login
+                await Shell.Current.GoToAsync("/");
+            }
+            else
+            {
+                MostrarError("Error al registrar el usuario");
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            MostrarError($"Error de conexión: {ex.Message}");
         }
         catch (Exception ex)
         {
-            MensajeLabel.Text = ex.Message;
-            MensajeLabel.IsVisible = true;
+            MostrarError($"Error: {ex.Message}");
+        }
+        finally
+        {
+            var button = sender as Button;
+            button.IsEnabled = true;
+            button.Text = "Registrarse";
         }
     }
 
-    private async void OnLoginTapped(object sender, EventArgs e)
+    private async void OnVolverLoginClicked(object sender, EventArgs e)
     {
-        // luego hacemos login page
-        await DisplayAlert("Info", "Ir a login (pendiente)", "OK");
+        bool confirmar = await DisplayAlert("Confirmar", 
+            "¿Deseas volver al login? Se perderán los datos ingresados.", 
+            "Sí", "No");
+
+        if (confirmar)
+        {
+            await Shell.Current.GoToAsync("/");
+        }
+    }
+
+    private void MostrarError(string mensaje)
+    {
+        MensajeLabel.Text = mensaje;
+        MensajeLabel.IsVisible = true;
+    }
+
+    private void LimpiarCampos()
+    {
+        NombreCompletoEntry.Text = "";
+        CedulaEntry.Text = "";
+        TelefonoEntry.Text = "";
+        EmailEntry.Text = "";
+        UniversidadEntry.Text = "";
+        CarnetEntry.Text = "";
+        EsEstudianteSwitch.IsToggled = false;
     }
 }

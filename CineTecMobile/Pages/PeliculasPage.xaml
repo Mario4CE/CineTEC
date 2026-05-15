@@ -23,15 +23,15 @@
                         <VerticalStackLayout>
 
                             <Label Text="{Binding NombreComercial}"
-                               TextColor="White"
+                               TextColor="Black"
                                FontSize="18"
                                FontAttributes="Bold"/>
 
                             <Label Text="{Binding Duracion, StringFormat='Duración: {0} min'}"
-                                TextColor="White"/>
+                                TextColor="Black"/>
 
                             <Label Text="{Binding Director}"
-                                TextColor="White"/>  
+                                TextColor="Black"/>  
 
                             <Button Text="Seleccionar"
                                     Clicked="OnSeleccionarClicked"/>

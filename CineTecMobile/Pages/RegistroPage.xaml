@@ -1,43 +1,129 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="CineTecMobile.Pages.RegistroPage">
+             x:Class="CineTecMobile.Pages.RegistroPage"
+             Title="Registro">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="15">
+        <VerticalStackLayout Padding="20" Spacing="15">
 
             <!-- Header -->
             <Label Text="CineTec"
-                   FontSize="28"
-                   HorizontalOptions="Center"/>
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#2c3e50"/>
 
-            <Label Text="Crea tu cuenta y comienza a reservar"
+            <Label Text="Crea tu cuenta"
+                   FontSize="18"
+                   HorizontalOptions="Center"
+                   TextColor="#7f8c8d"/>
+
+            <Label Text="y comienza a reservar boletos"
                    FontSize="14"
-                   HorizontalOptions="Center"/>
+                   HorizontalOptions="Center"
+                   TextColor="#95a5a6"
+                   Margin="0,0,0,20"/>
 
-            <!-- Inputs -->
-            <Entry x:Name="NombreEntry" Placeholder="Nombre" />
-            <Entry x:Name="ApellidoEntry" Placeholder="Apellido" />
-            <Entry x:Name="CedulaEntry" Placeholder="Cédula" Keyboard="Numeric"/>
-            <Entry x:Name="TelefonoEntry" Placeholder="Teléfono (Opcional)" Keyboard="Telephone"/>
+            <!-- Nombre Completo -->
+            <Label Text="Nombre Completo"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"/>
+            <Entry x:Name="NombreCompletoEntry" 
+                   Placeholder="Ej: Juan Pérez"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Text"/>
 
-            <DatePicker x:Name="FechaNacimientoPicker" />
+            <!-- Cédula -->
+            <Label Text="Cédula"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"/>
+            <Entry x:Name="CedulaEntry" 
+                   Placeholder="Ej: 1234567890"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Numeric"/>
 
-            <!-- Botón -->
-            <Button Text="Registrarse"
-                    Clicked="OnRegisterClicked"/>
+            <!-- Teléfono -->
+            <Label Text="Teléfono (Opcional)"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"/>
+            <Entry x:Name="TelefonoEntry" 
+                   Placeholder="Ej: 8765432100"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Telephone"/>
 
-            <!-- Mensajes -->
-            <Label x:Name="MensajeLabel"
-                   TextColor="Red"
+            <!-- Email (Opcional) -->
+            <Label Text="Correo (Opcional)"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"/>
+            <Entry x:Name="EmailEntry" 
+                   Placeholder="Ej: correo@ejemplo.com"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Email"/>
+
+            <!-- Es Estudiante -->
+            <Label Text="¿Eres Estudiante?"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"/>
+            <Switch x:Name="EsEstudianteSwitch"
+                    IsToggled="False"
+                    Margin="0,5,0,0"/>
+
+            <!-- Universidad (mostrar solo si es estudiante) -->
+            <Label x:Name="UniversidadLabel"
+                   Text="Universidad"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"
+                   IsVisible="False"/>
+            <Entry x:Name="UniversidadEntry" 
+                   Placeholder="Ej: TEC"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Text"
                    IsVisible="False"/>
 
-            <!-- Login -->
-            <Label Text="¿Ya tienes cuenta? Inicia sesión"
-                   HorizontalOptions="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnLoginTapped"/>
-                </Label.GestureRecognizers>
-            </Label>
+            <!-- Carnet (mostrar solo si es estudiante) -->
+            <Label x:Name="CarnetLabel"
+                   Text="Número de Carnet"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   TextColor="#2c3e50"
+                   Margin="0,10,0,0"
+                   IsVisible="False"/>
+            <Entry x:Name="CarnetEntry" 
+                   Placeholder="Ej: 12345678"
+                   ClearButtonVisibility="WhileEditing"
+                   Keyboard="Numeric"
+                   IsVisible="False"/>
+
+            <!-- Mensaje de error -->
+            <Label x:Name="MensajeLabel"
+                   TextColor="Red"
+                   IsVisible="False"
+                   Margin="0,10,0,0"/>
+
+            <!-- Botones -->
+            <Button Text="Registrarse"
+                    BackgroundColor="#27ae60"
+                    TextColor="White"
+                    Clicked="OnRegisterClicked"
+                    FontAttributes="Bold"
+                    Margin="0,20,0,0"/>
+
+            <Button Text="Volver al Login"
+                    BackgroundColor="#95a5a6"
+                    TextColor="White"
+                    Clicked="OnVolverLoginClicked"
+                    FontAttributes="Bold"/>
 
         </VerticalStackLayout>
     </ScrollView>

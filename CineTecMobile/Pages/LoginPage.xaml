@@ -15,7 +15,8 @@
                Placeholder="Ej: 123456789"
                Keyboard="Numeric"/>
 
-        <Button Text="Ingresar"
+        <Button x:Name="LoginButton"
+                Text="Ingresar"
                 Clicked="OnLoginClicked"/>
         
         <Label Text="¿Eres nuevo en CineTEC?"
