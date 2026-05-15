@@ -16,8 +16,8 @@
 Si necesitas cambiar la IP del API:
 
 1. Abre: `Services/ApiService.cs`
-2. Línea 21: `private const string BaseApiUrl = "http://172.18.92.169:5000/api";`
-3. Reemplaza `172.18.92.169` con tu IP
+2. Línea 21: `private const string BaseApiUrl = "http://172.18.122.238:5000/api";`
+3. Reemplaza `172.18.122.238` con tu IP
 4. Reconstruye y ejecuta: Ctrl+Shift+B, luego F5
 
 
@@ -36,8 +36,8 @@ Verifica que tu servidor esté en esa IP y puerto 5000
 **Si tu PC tiene OTRA IP:**
 - Abre PowerShell y ejecuta: `ipconfig | Select-String "IPv4"`
 - Ve a `Services/ApiService.cs` línea 21
-- Cambia: `private const string BaseApiUrl = "http://172.18.92.169:5000/api";`
-- Reemplaza `172.18.92.169` con tu IP
+- Cambia: `private const string BaseApiUrl = "http://172.18.122.238:5000/api";`
+- Reemplaza `172.18.122.238` con tu IP
 
 ---
 

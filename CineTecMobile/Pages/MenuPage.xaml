@@ -16,11 +16,6 @@
         <Button Text="Comprar boletos"
                 Clicked="OnCinesClicked" />
 
-        <Button Text="Ver mis boletos"
-                Clicked="OnMisBoletosClicked" />
-
-        <Button Text="Mi perfil"
-                Clicked="OnPerfilClicked" />
 
         <Button Text="Cerrar sesión"
                 BackgroundColor="Red"

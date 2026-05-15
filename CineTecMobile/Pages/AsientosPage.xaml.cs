@@ -9,8 +9,8 @@ public partial class AsientosPage : ContentPage
 
     HashSet<string> seleccionados = new();
 
-    int filas = 10;
-    int columnas = 12;
+    int filas = 8;
+    int columnas = 10;
     
     private readonly ReservaService _reservaService;
 
@@ -29,6 +29,10 @@ public partial class AsientosPage : ContentPage
 
         InfoLabel.Text = $"{peli} - {hora}";
 
+        // Limpiar asientos seleccionados previamente
+        seleccionados.Clear();
+        ActualizarResumen();
+
         GenerarAsientos();
     }
 
@@ -41,7 +45,7 @@ public partial class AsientosPage : ContentPage
         // filas
         for (int i = 0; i < filas; i++)
         {
-            AsientosGrid.RowDefinitions.Add(new RowDefinition { Height = 40 });
+            AsientosGrid.RowDefinitions.Add(new RowDefinition { Height = 35 });
         }
 
         // columnas
@@ -51,7 +55,7 @@ public partial class AsientosPage : ContentPage
         // Columnas de asientos
         for (int j = 0; j < columnas; j++)
         {
-            AsientosGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = 40 });
+            AsientosGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = 35 });
         }
 
         var random = new Random();
@@ -79,10 +83,10 @@ public partial class AsientosPage : ContentPage
                 var btn = new Button
                 {
                     Text = (col + 1).ToString(), // numeración correcta
-                    FontSize = 10,
-                    WidthRequest = 35,
-                    HeightRequest = 35,
-                    CornerRadius = 5
+                    FontSize = 9,
+                    WidthRequest = 30,
+                    HeightRequest = 30,
+                    CornerRadius = 4
                 };
 
                 int r = random.Next(100);

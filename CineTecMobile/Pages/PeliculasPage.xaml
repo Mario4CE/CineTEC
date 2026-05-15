@@ -1,51 +1,53 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CineTecMobile.Pages.PeliculasPage">
+    <ScrollView>
+        <VerticalStackLayout Padding="10">
 
-    <VerticalStackLayout Padding="10">
+            <!-- Título -->
+            <Label Text="Películas en cartelera"
+           FontSize="24"
+           HorizontalOptions="Center"/>
 
-        <!-- Título -->
-        <Label Text="Películas en cartelera"
-               FontSize="24"
-               HorizontalOptions="Center"/>
+            <Label x:Name="NombreCineLabel"
+           FontSize="14"
+           HorizontalOptions="Center"/>
 
-        <Label x:Name="NombreCineLabel"
-               FontSize="14"
-               HorizontalOptions="Center"/>
+            <!-- Lista -->
+            <CollectionView x:Name="PeliculasList">
 
-        <!-- Lista -->
-        <CollectionView x:Name="PeliculasList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="5" Padding="10">
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Margin="5" Padding="10">
+                            <VerticalStackLayout>
 
-                        <VerticalStackLayout>
+                                <Label Text="{Binding NombreComercial}"
+                           TextColor="Black"
+                           FontSize="18"
+                           FontAttributes="Bold"/>
 
-                            <Label Text="{Binding NombreComercial}"
-                               TextColor="Black"
-                               FontSize="18"
-                               FontAttributes="Bold"/>
+                                <Label Text="{Binding Duracion, StringFormat='Duración: {0} min'}"
+                            TextColor="Black"/>
 
-                            <Label Text="{Binding Duracion, StringFormat='Duración: {0} min'}"
-                                TextColor="Black"/>
+                                <Label Text="{Binding Director}"
+                            TextColor="Black"/>
 
-                            <Label Text="{Binding Director}"
-                                TextColor="Black"/>  
+                                <Button Text="Seleccionar"
+                                Clicked="OnSeleccionarClicked"/>
 
-                            <Button Text="Seleccionar"
-                                    Clicked="OnSeleccionarClicked"/>
+                            </VerticalStackLayout>
 
-                        </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
 
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
+            </CollectionView>
 
-        </CollectionView>
+            <ActivityIndicator x:Name="LoadingIndicator"/>
 
-        <ActivityIndicator x:Name="LoadingIndicator"/>
+        </VerticalStackLayout>
+    </ScrollView>
 
-    </VerticalStackLayout>
 
 </ContentPage>

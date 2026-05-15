@@ -11,10 +11,21 @@ public partial class MenuPage : ContentPage
     {
         base.OnAppearing();
 
-        // Obtener nombre del usuario desde Preferences
-        string nombre = Preferences.Get("usuarioNombre", "Usuario");
+        // Obtener nombre y apellido del usuario desde Preferences
+        string nombre = Preferences.Get("usuarioNombre", "");
+        string apellido = Preferences.Get("usuarioApellido", "");
+        string nombreCompleto = $"{nombre} {apellido}".Trim();
 
-        BienvenidaUsuario.Text = $"¡Bienvenido, {nombre}!";
+        // Debug: mostrar qué se carga
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            System.Diagnostics.Debug.WriteLine($"MenuPage - Nombre: '{nombre}', Apellido: '{apellido}', Completo: '{nombreCompleto}'");
+        });
+
+        if (string.IsNullOrWhiteSpace(nombreCompleto))
+            nombreCompleto = "Usuario";
+
+        BienvenidaUsuario.Text = $"¡Bienvenido, {nombreCompleto}!";
     }
 
     private async void OnCinesClicked(object sender, EventArgs e)
@@ -22,15 +33,8 @@ public partial class MenuPage : ContentPage
         await Shell.Current.GoToAsync("CinesPage");
     }
 
-    private async void OnMisBoletosClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("MisBoletosPage");
-    }
 
-    private async void OnPerfilClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("PerfilPage");
-    }
+   
 
     private async void OnLogoutClicked(object sender, EventArgs e)
     {

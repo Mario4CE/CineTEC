@@ -1,4 +1,7 @@
 using CineTecMobile.Services;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace CineTecMobile.Pages;
 
@@ -80,7 +83,7 @@ public partial class ResumenPage : ContentPage
 
     private async void OnDescargarClicked(object sender, EventArgs e)
     {
-        await DisplayAlert("Info", "Función de descarga disponible próximamente", "OK");
+        DisplayAlert("¡Funcionalidad en desarrollo!", "La descarga del resumen en PDF estará disponible próximamente. ¡Gracias por tu paciencia! 📄", "OK");
     }
 
     private async void OnVolverMenuClicked(object sender, EventArgs e)

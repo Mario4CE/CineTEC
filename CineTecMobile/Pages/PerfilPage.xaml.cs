@@ -23,10 +23,12 @@ public partial class PerfilPage : ContentPage
         try
         {
             // Obtener datos del usuario
-            string nombre = Preferences.Get("usuarioNombre", "Usuario");
+            string nombre = Preferences.Get("usuarioNombre", "");
+            string apellido = Preferences.Get("usuarioApellido", "");
+            string nombreCompleto = $"{nombre} {apellido}".Trim();
             string cedula = Preferences.Get("usuarioCedula", "");
 
-            NombreLabel.Text = nombre;
+            NombreLabel.Text = string.IsNullOrWhiteSpace(nombreCompleto) ? "Usuario" : nombreCompleto;
             CedulaLabel.Text = cedula;
 
             // Obtener estadísticas de reservas

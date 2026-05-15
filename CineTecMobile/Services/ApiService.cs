@@ -14,8 +14,8 @@ public class ApiService
     // URL base configurable - se obtiene de preferencias
     // Para emulador Android: Usar IP real de la PC (NO localhost)
     // Para celular físico: Usar IP real de la PC en la misma red WiFi
-    private const string DefaultBaseApiUrl = "http://172.18.92.169:5000/api";
-
+    private const string DefaultBaseApiUrl = "http://172.18.122.238:5000/api";
+   
     private string GetBaseApiUrl()
     {
         // Intentar obtener la URL guardada en preferencias

@@ -45,13 +45,19 @@ public partial class LoginPage : ContentPage
                 return;
             }
 
+            // Log para debugging
+            _logger.LogInformation($"Usuario obtenido: Nombre='{usuario.Nombre}', Apellido='{usuario.Apellido}', Cedula='{usuario.Cedula}', NombreCompleto='{usuario.NombreCompleto}'");
+
             // Guardar sesión
-            Preferences.Set("usuarioNombre", usuario.NombreCompleto);
-            Preferences.Set("usuarioCedula", usuario.Cedula);
+            Preferences.Set("usuarioNombre", usuario.Nombre ?? "");
+            Preferences.Set("usuarioApellido", usuario.Apellido ?? "");
+            Preferences.Set("usuarioCedula", usuario.Cedula ?? "");
+
+            _logger.LogInformation($"Datos guardados en Preferences - Nombre: '{Preferences.Get("usuarioNombre", "")}', Apellido: '{Preferences.Get("usuarioApellido", "")}', Cedula: '{Preferences.Get("usuarioCedula", "")}'");
 
             _logger.LogInformation($"Login exitoso: {usuario.NombreCompleto}");
 
-            await DisplayAlert("Bienvenido", usuario.NombreCompleto, "OK");
+            await DisplayAlert("Bienvenido", $"Nombre: {usuario.Nombre}\nApellido: {usuario.Apellido}\nCédula: {usuario.Cedula}", "OK");
 
             await Shell.Current.GoToAsync("MenuPage");
         }
@@ -80,6 +86,6 @@ public partial class LoginPage : ContentPage
 
     private async void OnCrearCuentaClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("RegistroPage");
+        DisplayAlert("Crear Cuenta", "Funcionalidad de creación de cuenta no implementada aún.", "OK");
     }
 }
